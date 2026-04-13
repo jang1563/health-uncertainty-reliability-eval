@@ -199,4 +199,13 @@ If you use this benchmark, please cite this repository.
 
 ## License
 
-Released under the [MIT License](LICENSE). FDA source documents referenced in the benchmark are public U.S. government information; benchmark packets are human-authored paraphrases with source URLs preserved (see [Source Policy](#source-policy)).
+This package is covered by the repository's top-level split license:
+
+- **Code** (`eval/`, `scripts/`, `tests/`, all `.py` files) — [Apache License 2.0](../LICENSE).
+- **Data, prompts, rubrics, figures, reports, research** (`data/`, `docs/`, `figures/`, `reports/`, `research/`, all `.md`/`.csv`/`.jsonl`/`.json`/`.png`/`.svg`) — [Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)](../LICENSE-DATA).
+
+**Non-profit / academic / personal use**: free under the terms above, with attribution.
+
+**For-profit / commercial use of the dataset, prompts, or rubrics**: requires a separate commercial license. Contact the author (see [CITATION.cff](../CITATION.cff)) for commercial licensing.
+
+FDA source documents referenced in the benchmark are public U.S. government information; benchmark packets are human-authored paraphrases with source URLs preserved (see [Source Policy](#source-policy)).

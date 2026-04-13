@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: "If you use this benchmark, please cite it as below."
+title: "Health Uncertainty and Reliability Eval"
+abstract: >-
+  Two paired public benchmarks evaluating how faithfully language models
+  preserve evidence strength, uncertainty, and regulatory posture in
+  patient-facing health answers. Package 01 measures preservation of
+  USPSTF-style recommendation grade (A/B/C/D/I), uncertainty language, and
+  preference-sensitivity. Package 02 measures context-mediated answer shift
+  on a 90-item before/after FDA post-market safety-update protocol
+  (30 events x 3 prompt variants).
+type: dataset
+authors:
+  - family-names: "Kim"
+    given-names: "JangKeun"
+    alias: "jang1563"
+repository-code: "https://github.com/jang1563/health-uncertainty-reliability-eval"
+url: "https://github.com/jang1563/health-uncertainty-reliability-eval"
+license: "Apache-2.0 AND CC-BY-NC-4.0"
+license-url: "https://github.com/jang1563/health-uncertainty-reliability-eval#license"
+version: "0.1.0"
+date-released: "2026-04-13"
+keywords:
+  - benchmark
+  - evaluation
+  - language-models
+  - health
+  - uncertainty
+  - reliability
+  - USPSTF
+  - FDA
+  - drug-safety
+  - preventive-care

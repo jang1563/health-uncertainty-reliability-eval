@@ -1,0 +1,14 @@
+# Top-level runtime dependencies.
+#
+# Package 01 (evidence_to_recommendation_reliability_eval) uses only the Python
+# standard library (urllib, csv, json, argparse, ...). No third-party packages
+# are required to run its scripts.
+#
+# Package 02 (drug_safety_update_sensitivity_eval) requires the three
+# dependencies listed below for the real-model evaluation driver and figure
+# rendering. Unit tests (02/tests/) do not require them; the API SDKs are
+# imported lazily inside eval/run_eval.py.
+
+anthropic>=0.39.0
+openai>=1.0.0
+matplotlib>=3.7.0
