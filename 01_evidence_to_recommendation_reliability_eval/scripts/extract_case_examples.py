@@ -86,7 +86,7 @@ def main():
         "",
         f"- annotations: `{args.annotations}`",
         "",
-        "이 문서는 annotated CSV에서 benchmark identity를 가장 잘 보여주는 representative case를 뽑아 정리한 것이다.",
+        "This document collects representative cases from the annotated CSV that most clearly illustrate the benchmark's identity.",
         "",
     ]
 

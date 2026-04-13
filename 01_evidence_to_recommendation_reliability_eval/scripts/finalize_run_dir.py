@@ -27,18 +27,24 @@ def main():
     summarize_script = project_root / "scripts" / "summarize_annotations.py"
     extract_script = project_root / "scripts" / "extract_case_examples.py"
 
+    try:
+        annotation_arg = str(annotation_csv.relative_to(project_root))
+    except ValueError:
+        annotation_arg = str(annotation_csv)
+
     subprocess.run(
         [
             sys.executable,
             str(summarize_script),
             "--annotations",
-            str(annotation_csv),
+            annotation_arg,
             "--summary-json",
             str(summary_json),
             "--summary-md",
             str(summary_md),
         ],
         check=True,
+        cwd=project_root,
     )
 
     subprocess.run(
@@ -46,11 +52,12 @@ def main():
             sys.executable,
             str(extract_script),
             "--annotations",
-            str(annotation_csv),
+            annotation_arg,
             "--output-md",
             str(cases_md),
         ],
         check=True,
+        cwd=project_root,
     )
 
     print(f"Finalized run directory at {run_dir}")

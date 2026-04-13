@@ -3,7 +3,7 @@
 - checked_on: `2026-04-13`
 - working_title: `Evidence-to-Recommendation Reliability Eval`
 - parent_artifact_family: `Health Uncertainty and Reliability Eval`
-- status: `full-v1 dataset scaffold built; four real runs completed; expanded same-set freeze review recorded`
+- status: `full-v1 canonical run complete (120/120 scored on gpt-5-mini); five real runs complete; expanded same-set freeze review recorded`
 
 ## Purpose
 
@@ -91,6 +91,7 @@ That is, this is **not** a `recommendation generation system` and **not** a `cli
 - `reports/annotation_second_pass_notes_v1_40_20260412.md`
 - `reports/annotation_freeze_notes_v1_40_20260413.md`
 - `reports/full_v1_dataset_build_20260413.md`
+- `reports/full_v1_run_status_20260413.md`
 - `figures/README.md`
 - `research/00_scope_and_research_questions.md`
 - `research/01_github_landscape.md`
@@ -120,7 +121,7 @@ That is, this is **not** a `recommendation generation system` and **not** a `cli
 - Pilot dataset scaffold is built.
 - A `20`-item pilot draft is written and covers all of the `A/B/C/D/I` grades.
 - A `40`-item expanded candidate set is added and ready for the next run.
-- A `120`-item full-v1 scaffold is built and ready for the canonical full-v1 run.
+- A `120`-item full-v1 scaffold is built.
 - Annotation workflow scaffold is built.
 - Prompt-pack export workflow is built.
 - Smoke-test demo-run workflow is built.
@@ -135,12 +136,14 @@ That is, this is **not** a `recommendation generation system` and **not** a `cli
 - `runs/real_openai_gpt5nano_v1_40_20260412` has been generated and scored against the expanded 40-row candidate set.
 - `runs/real_openai_gpt5mini_v1_40_20260412` has also been generated and scored on the same-set.
 - `runs/real_run_v1_120_template_20260413` is initialized as the full-v1 canonical run template.
+- `runs/real_openai_gpt5mini_v1_120_20260413` has `120/120` generation complete and `120/120` judged rows scored (canonical full-v1 baseline).
 - The `response -> annotation sheet -> summary report` pipeline has scripts and templates included.
-- Four real model runs are complete.
+- Five real model runs are complete, including the full-v1 canonical baseline on `gpt-5-mini`.
 - The `gpt-5-mini` vs `gpt-5-nano` same-set head-to-head on the expanded candidate set is complete.
 - An annotation sanity-check queue has been produced for the expanded same-set results.
 - The residual 3-row sanity-check queue is finished through final reread; the current official annotation sheet is treated as the working frozen version.
 - The full-v1 dataset build summary is in `reports/full_v1_dataset_build_20260413.md`.
+- The current full-v1 run state, provisional metrics, and missing retry list are in `reports/full_v1_run_status_20260413.md`.
 - A publication-style draft of the frozen 40-row same-set results is in `reports/expanded_same_set_public_draft_20260413.md`.
 - Shorter external brief and manuscript-style results-section drafts are in `reports/expanded_same_set_external_brief_20260413.md` and `reports/expanded_same_set_results_section_20260413.md`.
 - A manuscript-style full draft (intro → methods → results → discussion → limits) is in `reports/expanded_same_set_manuscript_draft_20260413.md`.
@@ -154,11 +157,10 @@ That is, this is **not** a `recommendation generation system` and **not** a `cli
 
 ## Immediate next steps
 
-1. Execute the canonical full-v1 model run against `runs/real_run_v1_120_template_20260413`.
-2. Fill full-v1 `outputs.csv` and annotations with `scripts/run_openai_responses.py` and `scripts/judge_annotations_openai.py`.
-3. Generate the full-v1 summary and qualitative cases via `scripts/finalize_run_dir.py`.
-4. Update `reports/health_reliability_eval_v1.md` to center on the full-v1 canonical result.
-5. Keep the expanded `40`-row same-set results as the manuscript package and stress-test reference.
+1. Run the full-v1 canonical on a second provider (candidate: Anthropic `claude-haiku-4-5` or `claude-sonnet-4`) for cross-provider comparison on the same 120 items.
+2. Generate publication-ready PNG figures for the full-v1 canonical result.
+3. Add a full-v1 section to `reports/expanded_same_set_manuscript_draft_20260413.md`.
+4. Keep the expanded `40`-row same-set results as the manuscript package and stress-test reference.
 
 ## License
 
