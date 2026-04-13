@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Matplotlib cache
+.matplotlib/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Local tool state (may contain machine-specific permissions)
+.claude/
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+credentials*.json
+secrets*.json
+
+# Logs
+*.log
+
+# Internal session handoff notes and strategy memos — not for public repo
+HANDOFF_*.md
+**/HANDOFF_*.md
+08_Health_AI_Flagship_Artifact_Initiation.md

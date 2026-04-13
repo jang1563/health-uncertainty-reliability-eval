@@ -1,0 +1,3 @@
+run_name,scored_rows,overall_rubric_score,grade_fidelity_accuracy,C_grade_preference_omission_rate,I_statement_overrecommendation_rate,unsupported_directive_rate
+demo_handcrafted_reference,20,2.0,1.0,0.0,0.0,0.0
+demo_overconfident_baseline,20,1.16,0.4,1.0,1.0,0.6

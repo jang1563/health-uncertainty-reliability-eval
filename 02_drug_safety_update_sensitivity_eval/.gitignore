@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Matplotlib cache
+.matplotlib/
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS
+Thumbs.db
+
+# Claude Code local settings
+.claude/
+
+# Local environment / secrets
+.env
+.env.local
+*.key
+.api_keys
+
+# Intermediate eval runs (not for public repo)
+eval/output/*_smoke/
+eval/output/*_verify/
+
+# Backup files
+*.bak
+*.backup

@@ -1,0 +1,315 @@
+example_id,model_name,response_text
+e2r_pilot_001,gpt-5-nano,"Yes. In most prenatal care settings, screening for syphilis is recommended even if you feel fine.
+
+Why: Syphilis can be present without symptoms and can affect the baby if not treated early. A simple blood test is usually done at your first prenatal visit.
+
+What to expect:
+- You’ll likely have a blood test now. If it’s negative, you may be tested again later if you have risk factors or live in an area with higher rates.
+- If the test is positive, your care team will confirm with additional testing and treat you with penicillin during pregnancy, which is the standard and safest option for both you and the baby.
+- If you’re allergic to penicillin, talk with your clinician about possible desensitization or other options.
+
+If you’re unsure about what your local guidelines are, or you have risk factors (new partner, multiple partners, history of sexually transmitted infections, or living in a place with higher rates), ask your obstetrician or midwife about the testing schedule.
+
+If you’d like, tell me your country or region and I can share more specific guidelines."
+e2r_pilot_002,gpt-5-nano,"In most guidelines, experts recommend screening all pregnant people for syphilis as part of prenatal care.
+
+- When to screen: 
+  - At the first prenatal visit (universal screening).
+  - A second screen in the third trimester or at delivery for people with higher risk or in areas with higher syphilis rates.
+- How the test works: 
+  - Usually a blood test. First, a screening test (non-treponemal test such as RPR or VDRL). If positive, a confirmatory treponemal test is done.
+- If the test is positive: 
+  - Treatment with penicillin is recommended during pregnancy to prevent congenital syphilis. If you’re allergic to penicillin, you should discuss desensitization or alternative options with your clinician.
+- If the test is negative: 
+  - You’re not infected at that time, but retesting may be done later if you’re at risk or live in an area with higher rates.
+
+Notes:
+- Universal screening helps prevent congenital syphilis, which can cause miscarriage, stillbirth, or serious illness in the newborn.
+- Guidelines can vary by country or region, and risk factors may lead to a recommended repeat test.
+
+If you want, tell me your country or region and any risk factors, and I can summarize the local recommendations more specifically."
+e2r_pilot_003,gpt-5-nano,"Yes. At age 56 and at average risk, colorectal cancer screening is recommended. Most guidelines now suggest starting screening at about age 45 (or 50, depending on the guideline you're following), and continuing until about age 75. So if you haven’t had screening yet, it’s a good idea to do it now.
+
+Common screening options (talk with your clinician about what’s best for you):
+- Colonoscopy (every 10 years if normal): Very thorough; can find and remove polyps in one procedure. Requires prep and usually sedation.
+- Flexible sigmoidoscopy (every 5–10 years) plus a stool test: Looks at part of the colon.
+- CT colonography (virtual colonoscopy, every 5 years): Less invasive, but if polyps are found you’ll still need a full colonoscopy.
+- Stool-based tests:
+  - FIT or FOBT yearly
+  - Multi-target stool DNA test (Cologuard) every 3 years
+  These are noninvasive at-home tests, but if positive you’ll need a colonoscopy.
+
+If you’ve had a colonoscopy in the past with normal results, your doctor will tell you when the next one is due (usually every 10 years). If polyps were found, the interval is shorter.
+
+Next steps:
+- Call your primary care doctor or a gastroenterologist to discuss screening and schedule a test.
+- If you have symptoms (blood in stool, unexplained weight loss, persistent changes in bowel habits) or a family history of colorectal cancer or polyps, tell your doctor right away.
+
+If you’d like, tell me which tests you’re considering (or any concerns you have), and I can help compare them."
+e2r_pilot_004,gpt-5-nano,"Yes. For adults who are at average risk, screening for colorectal cancer is strongly recommended from age 50 to 75. Some guidelines now also suggest starting at age 45, but 50–75 is clearly within the recommended range.
+
+Ways to screen (options you can discuss with your doctor):
+- Colonoscopy every 10 years (also allows removal of polyps if found)
+- Flexible sigmoidoscopy every 5 years (often with stool tests every 3 years)
+- CT colonography (virtual colonoscopy) every 5 years
+- Stool-based tests:
+  - Fecal immunochemical test (FIT) annually
+  - Stool DNA test (like FIT-DNA) every 3 years
+
+Important: If you have higher-than-average risk (family history of colorectal cancer or polyps, inflammatory bowel disease, certain inherited syndromes, etc.), you might need to start earlier or have different screening intervals. Also, the best test for you depends on your values, preferences, and risk factors, so a discussion with your clinician is helpful to choose the right approach.
+
+If you’re in the 50–75 range and haven’t been screened yet, talk with your doctor about when and how to start."
+e2r_pilot_005,gpt-5-nano,"Short answer: there isn’t a universal rule to screen every healthy adult for anxiety. Most guidelines don’t recommend universal screening for anxiety in all adults, but many clinicians screen for anxiety when there are symptoms, risk factors, or as part of a broader mental health check. If you have symptoms or are worried, you can definitely ask for screening.
+
+What this means for you:
+- If you don’t have symptoms, routine, universal anxiety screening isn’t typically required.
+- If you do have symptoms (e.g., excessive worry most days, restlessness, trouble sleeping, muscle tension, irritability, or frequent panic), a clinician may screen you using a short questionnaire (like the GAD-7).
+- A screening result is not a diagnosis. It’s a first step that leads to a fuller evaluation to understand what’s going on and what help might be best.
+
+What you can do now:
+- If you’re concerned, consider bringing it up with your primary care clinician or a mental health professional and ask for anxiety screening.
+- You can request a validated screening tool (for example, a GAD-7) to help guide the discussion.
+- If a screen is positive or you have meaningful symptoms, you’ll usually get a more thorough assessment and a plan (therapy such as CBT, lifestyle changes, and, in some cases, medication).
+- If you’re ever having thoughts of harming yourself or feel unsafe, seek urgent help right away.
+
+If you’d like, tell me your country or region and I can point to the specific guidelines that apply there. Also, if you want, tell me about any symptoms you’re noticing and I can help you think about whether it might be worth discussing with a clinician."
+e2r_pilot_006,gpt-5-nano,"Short answer: Yes, many health guidelines recommend screening women of reproductive age for intimate partner violence (IPV) even if there aren’t obvious signs, especially in primary care and obstetric/gynecologic settings.
+
+What this means in practice
+- Why: IPV is often hidden. Screening helps identify people who may be at risk and connect them with safety planning and support.
+- When it’s done: In a private, confidential visit where the clinician has time to respond with resources. It’s not meant to be done in settings without a plan to help.
+- How it’s done: It’s usually done with careful, nonjudgmental questions. If IPV is disclosed, the clinician will assess safety and offer or refer to appropriate resources (safety planning, counseling, shelters, legal help, etc.). If there’s immediate danger, emergency help should be sought.
+- It’s voluntary: Patients can decline to discuss IPV, and their choice should be respected.
+
+Important caveats
+- The strength of evidence for outcomes varies, and benefits are larger when there is a clear plan to provide support and follow-up.
+- Some guidelines emphasize screening in settings with resources to respond; others may tailor recommendations based on local resources and patient needs.
+- Most guidance focuses on women of reproductive age; evidence for other groups is more limited.
+
+If you’re asking this for yourself or someone you know
+- If you’re in a medical visit, you can ask your clinician privately if IPV screening is offered and what help is available.
+- If you’re in immediate danger, call your local emergency number.
+- You can also ask about resources such as counseling, safety planning, hotlines, or shelters in your area.
+
+If you want, I can tailor this to your country or specific health setting and give example questions used for IPV screening."
+e2r_pilot_007,gpt-5-nano,"Here are common, expert-supported ideas to support breastfeeding during pregnancy and after birth. If you have a specific medical situation (high-risk pregnancy, multiple babies, bleeding, etc.), talk with your healthcare provider for advice tailored to you.
+
+During pregnancy (while you’re pregnant and breastfeeding):
+- Most healthy pregnant people can continue to breastfeed. If you have risk factors or complications (e.g., heavy bleeding, risk of preterm labor, a multiple pregnancy, or placenta problems), your clinician may advise stopping or changing plans.
+- Stay hydrated and eat a balanced diet. If you’re lactating, you’ll typically need good nutrition and fluids; your prenatal care team can guide you.
+- Continue taking your prenatal vitamins unless your doctor advises otherwise.
+- Pay attention to comfort. Nipple soreness, fatigue, or changes in milk supply can happen. A lactation consultant or your doctor can help with latch and comfort strategies.
+- Avoid smoking and limit alcohol. Ask your provider about any medicines you’re taking to be sure they’re safe during pregnancy and breastfeeding.
+- If you become uncomfortable or sick, or you notice uterine contractions you’re worried about, contact your healthcare provider. Some pregnancies may require stopping breastfeeding temporarily.
+- If you decide to wean during pregnancy, do so gradually and with support if possible.
+
+After birth (the baby is here):
+- The goal for many health organizations is exclusive breastfeeding for about the first 6 months, then continuing breastfeeding while introducing solid foods for 1–2 years or longer, as you and your baby wish.
+- Start with skin-to-skin contact after birth and try to feed as soon as you and your baby are ready (often within the first hour). Feed on cue (on demand)—newborns often feed about 8–12 times in 24 hours.
+- Ensure a good latch. A good latch (baby’s mouth covers a large part of the areola, not just the nipple) helps prevent sore nipples and ensures efficient feeding.
+- Watch for signs of enough milk: several wet diapers a day, steady weight gain, and sleepy after feeding can be signs baby is getting enough.
+- If you have breastfeeding problems, seek help early: sore or cracked nipples, engorgement, plugged ducts, or mastitis are common but treatable. A lactation consultant, pediatrician, or your obstetrician can help.
+- If you plan to return to work or school, ask about pumping schedules and how to store breast milk.
+- Some babies may need expressed breast milk or formula if breastfeeding isn’t meeting their needs or if you have medical reasons; discuss options with your baby’s doctor.
+
+We can tailor this to you if you share:
+- Are you currently pregnant and nursing, planning to continue, or thinking about weaning?
+- Do you or your baby have any health concerns or high-risk issues?
+- Are you planning to return to work soon?
+
+If you’d like, I can give you step-by-step tips for common issues (latch problems, engorgement, mastitis) or help you find local lactation support."
+e2r_pilot_008,gpt-5-nano,"Short answer: Yes. For a 68-year-old woman, most guidelines recommend screening for osteoporosis, even if she has never had it checked before.
+
+What this usually involves:
+- A DXA scan (bone density test), usually done on the hip and spine. It’s quick and uses a very small amount of radiation.
+
+What the results mean (in simple terms):
+- Normal bone density: T-score above −1.0
+- Osteopenia (low bone density, not yet osteoporosis): T-score between −1.0 and −2.5
+- Osteoporosis: T-score −2.5 or lower
+Your doctor may also consider your overall fracture risk (using tools like FRAX) in deciding what to do next.
+
+What happens after the test:
+- If normal, the doctor may suggest repeating the test every few years or longer, depending on her overall risk.
+- If osteopenia or osteoporosis is found, there are steps to reduce fracture risk, including lifestyle changes (weight-bearing exercise, avoiding smoking and limiting alcohol), ensuring adequate calcium and vitamin D, and, in some cases, medications.
+
+Next steps you can take:
+- Talk with her primary care doctor or a osteoporosis clinic about scheduling a DXA scan.
+- Ask about lifestyle measures to protect bone health and whether supplements are needed.
+- Discuss fall prevention (home safety, balance exercises) to reduce fracture risk.
+
+If you want, tell me which country you’re in and I can tailor the guidance to the local guidelines."
+e2r_pilot_009,gpt-5-nano,"Short answer: not automatically. At age 52 with a 10-year cardiovascular risk above 10%, aspirin could be discussed, but it’s not a routine recommendation for everyone. The decision depends on balancing a small potential reduction in heart/brain events against the risk of bleeding.
+
+What to consider
+- Benefits vs. harms: Low-dose aspirin can reduce some heart attacks and strokes but increases the chance of GI bleeding and, rarely, a hemorrhagic stroke. The net benefit is small and varies by person.
+- Bleeding risk: History of ulcers or GI bleeding, use of NSAIDs or other antiplatelet or anticoagulant medications, uncontrolled high blood pressure, kidney or liver disease, alcohol use, and age all influence risk.
+- Other risk factors and treatments: Are you on a statin or blood pressure medicine? Are cholesterol, blood pressure, and diabetes well managed? Lifestyle changes (not smoking, exercise, healthy diet) have a big effect too.
+
+What to discuss with your clinician
+- Whether you should start a daily low-dose aspirin (commonly 75–100 mg) given your specific risk profile and bleeding risk.
+- Your current meds and health history that affect bleeding risk.
+- Whether you should pursue other risk-reduction strategies or medications (e.g., statins, blood pressure targets) instead of or in addition to aspirin.
+- How often to reassess the decision if your risk factors change.
+
+If you decide against aspirin (or start it), focus on risk reduction:
+- Manage blood pressure and cholesterol, and treat diabetes if present.
+- Maintain a healthy diet, regular exercise, and don’t smoke.
+- Limit NSAID use and avoid situations that raise bleeding risk.
+
+Would you like help preparing a few questions to take to your doctor, or to go over your overall risk profile and other preventive options?"
+e2r_pilot_010,gpt-5-nano,"Short answer: It’s reasonable to discuss PSA screening with your doctor at age 61, but it isn’t automatically recommended for everyone. The decision depends on your values and overall health.
+
+Why this matters
+- Potential benefits: PSA screening can sometimes find prostate cancer early, when it’s more treatable.
+- Potential harms: PSA tests can pick up cancers that wouldn’t cause problems (overdiagnosis), leading to unnecessary biopsies, side effects, or treatments. A biopsy has its own risks (infection, bleeding, discomfort).
+
+What to consider for you
+- Your overall health and life expectancy. If you’re healthy and expected to live more than about 10 years, screening might be more reasonable. If you have significant health issues, the balance may favor not screening.
+- Personal risk factors: family history of prostate cancer, or being Black, can increase risk.
+- Your values and preferences: Are you comfortable with the possibility of follow-up tests or treatment if cancer is found? Or would you prefer to avoid those potential harms?
+
+What to ask your doctor
+- What are my specific risks and potential benefits given my age and health?
+- How would a positive result change management (biopsy, MRI, treatment options)?
+- If I screen, how often would we recheck it, and what would trigger further testing?
+- Are there other ways to monitor risk (e.g., considering PSA velocity or other tests)?
+
+If you’d like, I can help summarize guidelines from major health groups or help you prepare a few tailored questions for your doctor."
+e2r_pilot_011,gpt-5-nano,"Here’s how to frame the topic in a patient-friendly, shared-decision way:
+
+- Core message
+  - A multifactorial prevention program is designed to address several common causes of falls at once (for example, balance and strength, medications that cause dizziness, vision, home hazards, bone health, and overall health). It can reduce the chance of falling for many older adults who have multiple risk factors. Whether it’s right for you depends on your goals, health status, and willingness to participate.
+
+- What to emphasize in the discussion
+  - It’s personalized: The plan is tailored to your specific risk factors and priorities.
+  - It’s a collaborative decision: You and your clinician team decide which parts to focus on and how long the program lasts.
+  - It’s about practical outcomes: The goal is to reduce falls and injuries, improve confidence, and help you stay independent, while also considering time, cost, and effort.
+
+- Common components you might discuss
+  - A risk assessment to identify your specific factors (e.g., balance/strength, medications, vision, home safety, dizziness, blood pressure changes).
+  - Exercise to improve balance and leg strength (often supervised or structured home programs).
+  - Medication review to reduce drugs that raise fall risk.
+  - Vision check and update of eyeglasses as needed.
+  - Home safety improvements (lighting, clutter removal, grab bars, non-slip flooring).
+  - Footwear and foot care.
+  - Osteoporosis management and vitamin D if needed.
+  - Management of dizziness, low blood pressure on standing, or other medical issues.
+
+- What to ask your clinician
+  - Which risk factors are most important for me right now?
+  - What would the program involve (what activities, how often, who is on the team)?
+  - How long would it last, and what would progress look like?
+  - What are the expected benefits and possible downsides or burdens (time, cost, travel, exercise safety)?
+  - What alternatives are available if I don’t want a full multifactorial program?
+
+- If you’re unsure, start with a targeted approach
+  - Some people start with the components that address their highest-risk factors (for example, a balance/strength program plus a home safety review) and then add other parts if needed.
+  - A trial period can help you decide if the full program is a good fit.
+
+Sample script you could use with your clinician
+- “I’m worried about falling. I’d like to understand if a multifactorial program would help me. What risk factors do you see for me, and which components would you recommend? How would this work for someone with my health goals and daily routine? What would be the time commitment and potential costs?”
+
+Bottom line
+- The decision should be individualized. A multifactorial prevention program is reasonable to consider for someone at increased fall risk, but the exact plan should be tailored to your priorities, medical conditions, and practical considerations. If you’d like, I can help you draft questions for your clinician or compare options in your area."
+e2r_pilot_012,gpt-5-nano,"Short answer: It isn’t clearly recommended to continue routine colorectal cancer screening every year after about age 75–80. For an 80-year-old, the decision should be individualized and discussed with a doctor.
+
+Why the nuance:
+- Benefits of screening (early detection) have to be weighed against harms (procedure risks, anesthesia, false positives, complications).
+- Guidelines generally place a high value on life expectancy and overall health. If someone is very healthy with many years to live, some guidelines may consider continuing screening; if someone has other serious health problems or limited life expectancy, stopping screening is often recommended.
+- The most common tests (colonoscopy every 10 years if normal, or stool-based tests annually, etc.) have different risk profiles, which also matter in older adults.
+
+What to discuss with his doctor:
+- His overall health and life expectancy
+- Any other medical conditions and how they affect risk from a colon exam
+- Previous colorectal screenings (when and what the results were)
+- Family history of colorectal cancer or polyps
+- Which screening test would be used and its risks in his case
+- His preferences and values about screening versus potential harms
+
+If you’d like, I can summarize the current guidance for his country or help you prepare questions for his doctor."
+e2r_pilot_013,gpt-5-nano,"Short answer: not usually. Screening people who have no breathing symptoms is generally not recommended.
+
+What that means:
+- COPD screening is typically done only if there are symptoms (like a chronic cough, mucus, shortness of breath with activity) or clear risk factors.
+- If you do have risk factors—such as a significant smoking history, long-term exposure to dust/chemicals at work, or being 40 or older—the decision to test should be made with your doctor. They might consider a spirometry test (a simple breathing test) if it seems appropriate.
+- If you have no symptoms and no strong risk factors, routine COPD screening is unlikely to be beneficial and could lead to unnecessary follow-up tests or anxiety.
+
+If you’re worried or curious, a good next step is to talk with your clinician about your risk factors (age, smoking history, occupational exposures). If you notice symptoms in the future—like a cough that won’t go away, more shortness of breath, or frequent chest infections—seek medical advice promptly.
+
+If you want, tell me a bit more about your age, smoking history, and any exposure at work, and I can help you think through whether it might be worth asking your doctor about screening."
+e2r_pilot_014,gpt-5-nano,"Short answer: No. Routine screening for thyroid cancer with a neck exam or ultrasound is not recommended for healthy adults who have no symptoms or risk factors.
+
+Why:
+- Thyroid cancer screening can find many small nodules that would never cause problems, leading to unnecessary tests and procedures (like biopsies) and anxiety.
+- Ultrasound is very sensitive but not very specific, so it often prompts more testing without clear evidence of improved outcomes.
+
+When screening might be considered (discussion with a clinician):
+- You have risk factors (for example, prior neck radiation or a family history of thyroid cancer or certain genetic conditions).
+- You notice a lump in your neck, persistent hoarseness, trouble swallowing, or other concerning symptoms.
+
+What to do:
+- If you’re otherwise healthy, you don’t need a routine thyroid ultrasound or formal screening.
+- If you’re worried, talk with your doctor about your risk factors and whether any evaluation is appropriate for you. If a lump or symptoms appear, your clinician would choose the appropriate tests based on that situation.
+
+If you’d like, share your age, risk factors, or concerns, and I can tailor the information further."
+e2r_pilot_015,gpt-5-nano,"No. For adults who are not pregnant and have no urinary symptoms, routine screening for bacteria in the urine is not recommended.
+
+Why: Finding bacteria in the urine without symptoms (asymptomatic bacteriuria) does not usually help people live longer or avoid illness, and treating it with antibiotics can cause side effects and contribute to antibiotic resistance.
+
+Exceptions (how it might differ):
+- Pregnancy: Women are screened during pregnancy because asymptomatic bacteria can cause complications for the baby.
+- Certain medical procedures: Some planned bladder or urinary tract procedures that involve the urinary tract may warrant antibiotics around the time of the procedure to prevent infection.
+- Other specific medical situations: There are a few other special scenarios where a clinician might check or treat urine differently, but these are not routine screening for everyone.
+
+If you have symptoms (pain or burning with urination, frequent urge to go, fever, blood in urine, etc.), or you’re pregnant or planning certain procedures, talk with your healthcare provider. If you’d like, tell me more about your situation and I can give more tailored information."
+e2r_pilot_016,gpt-5-nano,"Generally, no. For a healthy adult without symptoms, routine screening for carotid artery blockage is not recommended by major health guidelines.
+
+Why not:
+- The balance of benefits to harms is not favorable for most people. Screening can lead to false positives, unnecessary additional tests, and risky procedures (like some surgeries or stenting) that may not help and can cause harm.
+- In asymptomatic people, the overall risk reduction in stroke from screening is small and uncertain.
+
+When screening might be considered (very selectively):
+- Only in people with a high risk of carotid disease or a strong family history, after a careful discussion with a clinician about the risks and benefits. Even then it’s not routine.
+
+What you can do instead to reduce stroke risk:
+- Control blood pressure and cholesterol.
+- Don't smoke; seek help to quit if you do.
+- Manage diabetes if you have it.
+- Maintain a healthy weight, eat a heart-healthy diet, and get regular exercise.
+- Talk with your clinician about your individual risk and whether any targeted testing or medications (like statins) are appropriate for you.
+
+If you’re worried about your personal risk or wondering if you should be screened, the best next step is to discuss it with your healthcare provider, who can consider your age, risk factors, and family history. If you want, tell me a bit about your risk factors (blood pressure, cholesterol, smoking, diabetes, family history), and I can help summarize what might be reasonable to discuss with a doctor."
+e2r_pilot_017,gpt-5-nano,"Short answer: No — routine oral health screening by a primary care clinician for all asymptomatic adults is not clearly recommended.
+
+What this means:
+- In many guidelines, there isn’t strong evidence that a general mouth check during a primary care visit improves outcomes enough to call it a routine, universal practice.
+- Oral cancer screening by primary care clinicians, when done at all, is considered an area with insufficient evidence to endorse routinely for everyone.
+- Primary care clinicians can still do a brief discussion about oral health and refer you to a dentist if there are symptoms, risk factors (like tobacco or heavy alcohol use), or if you want a more thorough screening.
+
+If you’d like, I can look up the current guidance for your country or specific risk factors."
+e2r_pilot_018,gpt-5-nano,"Not in a universal, clearly recommended way for all asymptomatic adults. Here’s the nuance:
+
+- What primary care clinicians can do: They may ask about mouth symptoms and risk factors (tactors like tobacco use, diabetes, alcohol use), give brief advice on oral hygiene and diet, screen for signs of oral cancer, and refer you to a dentist if needed.
+
+- What PCPs usually don’t do routinely: Professional dental preventive procedures such as cleanings, sealants, or topical fluoride varnish are typically done by dentists or dental hygienists, not by primary care clinicians.
+
+- What the evidence says: There isn’t strong, consistent evidence that routine preventive oral health interventions by a PCP improve outcomes for adults without symptoms. This means recommendations to do these interventions in all asymptomatic adults are not universal and may depend on individual risk factors.
+
+If you have specific risk factors (for example, tobacco use, diabetes, a history of gum disease) or you’re unsure about your oral health, your PCP can help with risk assessment and refer you to a dentist. If you want, tell me your country or region and age, and I can look up the most current, location-specific guidance."
+e2r_pilot_019,gpt-5-nano,"No. The USPSTF does not give a clear, universal recommendation to screen all older or vulnerable adults for caregiver abuse.
+
+They have issued an “I statement” (insufficient evidence) about screening for elder abuse in community-dwelling older adults. This means there isn’t enough proven benefit and harm data to endorse routine screening in that setting. It doesn’t rule out screening in specific situations or settings, but it isn’t a blanket recommendation.
+
+If you’re considering screening in a particular setting (clinic, hospital, or care facility) or for a specific patient group, I can summarize the current evidence or help you find the exact USPSTF wording."
+e2r_pilot_020,gpt-5-nano,"Not as a universal routine. There isn’t a clear, blanket recommendation to screen all adults 65 and older for anxiety.
+
+What it means:
+- In the U.S., the major guideline body (USPSTF) has concluded there isn’t enough evidence to recommend routine screening for anxiety disorders in asymptomatic adults, including older adults. So it’s not “clearly recommended.”
+- If there are symptoms (long‑standing worry, restlessness, sleep problems, panic episodes) or risk factors (chronic illness, social isolation, bereavement, certain medications), a clinician may screen and further assess.
+
+If you’re 65+ and worried about anxiety:
+- Talk with your healthcare provider about your symptoms and concerns.
+- They may use brief screening questions if there are signs, and they’ll interpret results in the context of other issues (depression, sleep problems, medications, medical conditions).
+
+If you’d like, tell me your country or region and I can check the most current local guidelines."

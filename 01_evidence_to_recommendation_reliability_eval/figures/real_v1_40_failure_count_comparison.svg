@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="440" viewBox="0 0 980 440">
+<style>
+.bg { fill: #fffaf3; }
+.panel { fill: #fffdf8; stroke: #eadfce; stroke-width: 1; }
+.title { font: 700 22px Georgia, serif; fill: #1f2937; }
+.label { font: 12px Helvetica, Arial, sans-serif; fill: #374151; }
+.small { font: 11px Helvetica, Arial, sans-serif; fill: #6b7280; }
+.axis { stroke: #9ca3af; stroke-width: 1; }
+.grid { stroke: #ece7df; stroke-width: 1; }
+</style>
+<rect width="100%" height="100%" class="bg"/>
+<rect x="20" y="18" width="940" height="404" rx="18" class="panel"/>
+<text x="44" y="48" class="title">Expanded Real Run Failure Count Comparison</text>
+<text x="44" y="68" class="small">Failure counts are raw row-level totals from each run summary.</text>
+<line x1="80" y1="340.0" x2="940" y2="340.0" class="grid"/>
+<text x="70" y="344.0" text-anchor="end" class="small">0</text>
+<line x1="80" y1="297.6666666666667" x2="940" y2="297.6666666666667" class="grid"/>
+<text x="70" y="301.6666666666667" text-anchor="end" class="small">2</text>
+<line x1="80" y1="255.33333333333334" x2="940" y2="255.33333333333334" class="grid"/>
+<text x="70" y="259.33333333333337" text-anchor="end" class="small">3</text>
+<line x1="80" y1="213.0" x2="940" y2="213.0" class="grid"/>
+<text x="70" y="217.0" text-anchor="end" class="small">4</text>
+<line x1="80" y1="170.66666666666669" x2="940" y2="170.66666666666669" class="grid"/>
+<text x="70" y="174.66666666666669" text-anchor="end" class="small">6</text>
+<line x1="80" y1="128.33333333333331" x2="940" y2="128.33333333333331" class="grid"/>
+<text x="70" y="132.33333333333331" text-anchor="end" class="small">8</text>
+<line x1="80" y1="86.0" x2="940" y2="86.0" class="grid"/>
+<text x="70" y="90.0" text-anchor="end" class="small">9</text>
+<line x1="80" y1="86" x2="80" y2="340" class="axis"/>
+<line x1="80" y1="340" x2="940" y2="340" class="axis"/>
+<text x="151.66666666666669" y="364" text-anchor="middle" class="label">grade deflation</text>
+<rect x="112.66666666666669" y="311.77777777777777" width="34" height="28.22222222222222" fill="#0f766e" rx="4"/>
+<text x="129.66666666666669" y="304.77777777777777" text-anchor="middle" class="small">1</text>
+<rect x="156.66666666666669" y="255.33333333333334" width="34" height="84.66666666666666" fill="#1d4ed8" rx="4"/>
+<text x="173.66666666666669" y="248.33333333333334" text-anchor="middle" class="small">3</text>
+<text x="295.0" y="364" text-anchor="middle" class="label">grade inflation</text>
+<rect x="256.0" y="311.77777777777777" width="34" height="28.22222222222222" fill="#0f766e" rx="4"/>
+<text x="273.0" y="304.77777777777777" text-anchor="middle" class="small">1</text>
+<rect x="300.0" y="311.77777777777777" width="34" height="28.22222222222222" fill="#1d4ed8" rx="4"/>
+<text x="317.0" y="304.77777777777777" text-anchor="middle" class="small">1</text>
+<text x="438.33333333333337" y="364" text-anchor="middle" class="label">missing uncertainty disclosure</text>
+<rect x="399.33333333333337" y="86.0" width="34" height="254.0" fill="#0f766e" rx="4"/>
+<text x="416.33333333333337" y="79.0" text-anchor="middle" class="small">9</text>
+<rect x="443.33333333333337" y="86.0" width="34" height="254.0" fill="#1d4ed8" rx="4"/>
+<text x="460.33333333333337" y="79.0" text-anchor="middle" class="small">9</text>
+<text x="581.6666666666666" y="364" text-anchor="middle" class="label">plausible but ungrounded claim</text>
+<rect x="542.6666666666666" y="340.0" width="34" height="0.0" fill="#0f766e" rx="4"/>
+<text x="559.6666666666666" y="333.0" text-anchor="middle" class="small">0</text>
+<rect x="586.6666666666666" y="311.77777777777777" width="34" height="28.22222222222222" fill="#1d4ed8" rx="4"/>
+<text x="603.6666666666666" y="304.77777777777777" text-anchor="middle" class="small">1</text>
+<text x="725.0" y="364" text-anchor="middle" class="label">preference omission</text>
+<rect x="686.0" y="114.22222222222223" width="34" height="225.77777777777777" fill="#0f766e" rx="4"/>
+<text x="703.0" y="107.22222222222223" text-anchor="middle" class="small">8</text>
+<rect x="730.0" y="86.0" width="34" height="254.0" fill="#1d4ed8" rx="4"/>
+<text x="747.0" y="79.0" text-anchor="middle" class="small">9</text>
+<text x="868.3333333333334" y="364" text-anchor="middle" class="label">unsupported directive</text>
+<rect x="829.3333333333334" y="311.77777777777777" width="34" height="28.22222222222222" fill="#0f766e" rx="4"/>
+<text x="846.3333333333334" y="304.77777777777777" text-anchor="middle" class="small">1</text>
+<rect x="873.3333333333334" y="340.0" width="34" height="0.0" fill="#1d4ed8" rx="4"/>
+<text x="890.3333333333334" y="333.0" text-anchor="middle" class="small">0</text>
+<rect x="80" y="394" width="14" height="14" fill="#0f766e" rx="2"/>
+<text x="102" y="406" class="label">gpt-5-mini (real_openai_gpt5mini_v1_40_20260412)</text>
+<rect x="310" y="394" width="14" height="14" fill="#1d4ed8" rx="2"/>
+<text x="332" y="406" class="label">gpt-5-nano (real_openai_gpt5nano_v1_40_20260412)</text>
+</svg>

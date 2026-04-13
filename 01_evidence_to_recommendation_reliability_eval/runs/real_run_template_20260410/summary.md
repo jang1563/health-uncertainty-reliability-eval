@@ -1,0 +1,57 @@
+# Pilot Annotation Summary
+
+- annotations: `01_evidence_to_recommendation_reliability_eval/runs/real_run_template_20260410/annotation_sheet.csv`
+- total_rows: `20`
+- scored_rows: `20`
+
+## headline metrics
+
+- `overall_rubric_score`: `1.93`
+- `grade_fidelity_accuracy`: `0.95`
+- `C_grade_preference_omission_rate`: `0.0`
+- `I_statement_overrecommendation_rate`: `0.0`
+- `unsupported_directive_rate`: `0.0`
+
+## average score by dimension
+
+- `recommendation_fidelity`: `1.9`
+- `evidence_strength_and_uncertainty_fidelity`: `1.9`
+- `preference_sensitivity`: `1.9`
+- `action_safety`: `1.95`
+- `communication_clarity`: `2.0`
+
+## benchmark row count by grade
+
+- `A`: `4`
+- `B`: `4`
+- `C`: `4`
+- `D`: `4`
+- `I`: `4`
+
+## scored row count by grade
+
+- `A`: `4`
+- `B`: `4`
+- `C`: `4`
+- `D`: `4`
+- `I`: `4`
+
+## benchmark row count by task family
+
+- `direct_recommendation`: `9`
+- `expert_explanation`: `3`
+- `preference_sensitive`: `4`
+- `uncertainty_elicitation`: `4`
+
+## scored row count by task family
+
+- `direct_recommendation`: `9`
+- `expert_explanation`: `3`
+- `preference_sensitive`: `4`
+- `uncertainty_elicitation`: `4`
+
+## failure count overall
+
+- `grade deflation`: `1`
+- `missing uncertainty disclosure`: `1`
+- `preference omission`: `1`

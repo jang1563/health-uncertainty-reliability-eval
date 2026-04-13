@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DrugSafetyUpdateSensitivityEvalItem",
+  "description": "One benchmark item in the Drug Safety Update Sensitivity Eval. Each event produces 3 items (one per prompt variant), totaling 90 items from 30 events.",
+  "type": "object",
+  "required": [
+    "case_id",
+    "drug_name",
+    "active_ingredient",
+    "application_type",
+    "update_date",
+    "section_changed",
+    "update_direction",
+    "severity_tier",
+    "source_type",
+    "srlc_url",
+    "dsc_url",
+    "openfda_query",
+    "dailymed_url",
+    "before_packet",
+    "after_packet",
+    "user_question",
+    "expected_answer_shift",
+    "must_mention",
+    "forbidden_stale_claim",
+    "rubric_notes",
+    "prompt_variant"
+  ],
+  "properties": {
+    "case_id": {
+      "type": "string",
+      "pattern": "^DSU-[0-9]{3}-(patient_plain_language|caregiver_or_followup|medication_use_decision)$",
+      "description": "Unique item ID. Format: DSU-NNN-variant_name."
+    },
+    "drug_name": {
+      "type": "string",
+      "description": "Brand name of the drug as it appears in FDA communications."
+    },
+    "active_ingredient": {
+      "type": "string",
+      "description": "INN or USAN active ingredient name."
+    },
+    "application_type": {
+      "type": "string",
+      "enum": ["NDA", "BLA"],
+      "description": "NDA or BLA only. No ANDA in v1."
+    },
+    "update_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of the FDA safety update (YYYY-MM-DD). Within 2024-01-01 to 2026-03-31. For stable controls, date of negative verification."
+    },
+    "section_changed": {
+      "type": "string",
+      "enum": [
+        "boxed_warning_or_contraindication",
+        "warnings_and_precautions",
+        "adverse_reactions",
+        "drug_interactions",
+        "specific_populations_or_patient_counseling",
+        "stable_control"
+      ],
+      "description": "Primary label section affected by the update, using combined categories from the v1 spec."
+    },
+    "update_direction": {
+      "type": "string",
+      "enum": ["risk_increase", "risk_decrease", "stable"],
+      "description": "Whether the update strengthened, relaxed, or did not change the safety posture. Shortened from spec 07 values: risk_increase = risk_increase_or_warning_strengthening, risk_decrease = risk_decrease_or_warning_removal, stable = stable_control."
+    },
+    "severity_tier": {
+      "type": "string",
+      "enum": ["critical", "high", "moderate", "low", "control"],
+      "description": "Severity tier assigned during curation. critical = new/strengthened boxed warning, high = new contraindication or major W&P change, moderate = adverse reaction or interaction update, low = minor patient counseling update, control = no change."
+    },
+    "source_type": {
+      "type": "string",
+      "enum": ["dsc", "srlc", "both", "control_no_update"],
+      "description": "Whether the event was sourced from Drug Safety Communication, SrLC, both, or is a control with no update."
+    },
+    "srlc_url": {
+      "type": ["string", "null"],
+      "description": "URL to FDA SrLC entry. Null for stable controls or events without SrLC entry."
+    },
+    "dsc_url": {
+      "type": ["string", "null"],
+      "description": "URL to FDA Drug Safety Communication. Null if not applicable."
+    },
+    "openfda_query": {
+      "type": "string",
+      "description": "openFDA API query string for label lookup, e.g. openfda.application_number:NDA021457."
+    },
+    "dailymed_url": {
+      "type": ["string", "null"],
+      "description": "DailyMed URL for current label. Link only — no text extraction."
+    },
+    "before_packet": {
+      "type": "string",
+      "description": "Human-authored normalized summary of the regulatory state BEFORE the update. Max 300 words."
+    },
+    "after_packet": {
+      "type": "string",
+      "description": "Human-authored normalized summary of the regulatory state AFTER the update. Max 300 words. For stable controls, states that no update occurred."
+    },
+    "user_question": {
+      "type": "string",
+      "description": "The question asked to the model, written in the style of the prompt_variant."
+    },
+    "expected_answer_shift": {
+      "type": "string",
+      "description": "Human-authored description of how the answer should change from the before to the after condition."
+    },
+    "must_mention": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Key concepts the after-packet answer MUST mention."
+    },
+    "forbidden_stale_claim": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Stale claims from the before-state that must NOT appear in the after-packet answer."
+    },
+    "rubric_notes": {
+      "type": "string",
+      "description": "Free-text notes for rubric scoring edge cases specific to this item."
+    },
+    "prompt_variant": {
+      "type": "string",
+      "enum": ["patient_plain_language", "caregiver_or_followup", "medication_use_decision"],
+      "description": "Which of the 3 prompt styles this item uses. Extension field beyond the locked 20-field spec, added to discriminate the 3 rows per event."
+    }
+  },
+  "additionalProperties": false
+}
