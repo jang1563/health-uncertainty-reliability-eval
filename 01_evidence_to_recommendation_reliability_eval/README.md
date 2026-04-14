@@ -3,7 +3,7 @@
 - checked_on: `2026-04-13`
 - working_title: `Evidence-to-Recommendation Reliability Eval`
 - parent_artifact_family: `Health Uncertainty and Reliability Eval`
-- status: `full-v1 canonical run complete (120/120 scored on gpt-5-mini); five real runs complete; expanded same-set freeze review recorded`
+- status: `full-v1 canonical run complete on gpt-5-mini (120/120); cross-provider extension complete on deepseek-chat (120/120, same judge); six real runs complete; expanded same-set freeze review recorded`
 
 ## Purpose
 
@@ -137,8 +137,9 @@ That is, this is **not** a `recommendation generation system` and **not** a `cli
 - `runs/real_openai_gpt5mini_v1_40_20260412` has also been generated and scored on the same-set.
 - `runs/real_run_v1_120_template_20260413` is initialized as the full-v1 canonical run template.
 - `runs/real_openai_gpt5mini_v1_120_20260413` has `120/120` generation complete and `120/120` judged rows scored (canonical full-v1 baseline).
-- The `response -> annotation sheet -> summary report` pipeline has scripts and templates included.
-- Five real model runs are complete, including the full-v1 canonical baseline on `gpt-5-mini`.
+- `runs/real_deepseek_chat_v1_120_20260413` has `120/120` generation and `120/120` judged rows scored on `deepseek-chat` with the same `gpt-5-mini` judge (cross-provider extension).
+- The `response -> annotation sheet -> summary report` pipeline has scripts and templates included, including `scripts/run_chat_completions.py` for any OpenAI-compatible provider (DeepSeek, Together, Groq, etc.).
+- Six real model runs are complete, including the full-v1 canonical and a cross-provider extension.
 - The `gpt-5-mini` vs `gpt-5-nano` same-set head-to-head on the expanded candidate set is complete.
 - An annotation sanity-check queue has been produced for the expanded same-set results.
 - The residual 3-row sanity-check queue is finished through final reread; the current official annotation sheet is treated as the working frozen version.
@@ -157,9 +158,9 @@ That is, this is **not** a `recommendation generation system` and **not** a `cli
 
 ## Immediate next steps
 
-1. Run the full-v1 canonical on a second provider (candidate: Anthropic `claude-haiku-4-5` or `claude-sonnet-4`) for cross-provider comparison on the same 120 items.
-2. Generate publication-ready PNG figures for the full-v1 canonical result.
-3. Add a full-v1 section to `reports/expanded_same_set_manuscript_draft_20260413.md`.
+1. Add a third provider (Anthropic `claude-haiku-4-5` or `claude-sonnet-4`) to test whether the identical `59.4%` C-grade preference-omission rate survives a third independent training pipeline.
+2. Add a fourth provider (ideally an open Llama-family model via Together or Groq) for a four-lineage test of the structural-pattern claim.
+3. Generate publication-ready PNG figures for the full-v1 canonical and cross-provider comparison.
 4. Keep the expanded `40`-row same-set results as the manuscript package and stress-test reference.
 
 ## License

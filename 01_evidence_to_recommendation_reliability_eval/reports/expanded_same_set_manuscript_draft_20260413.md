@@ -2,15 +2,18 @@
 
 - checked_on: `2026-04-13`
 - artifact_type: `manuscript-style draft`
-- benchmark_slice: `examples_v1_40.csv`
-- freeze_status: `working frozen after two adjudication refresh passes plus final residual reread`
+- benchmark_slice: `examples_v1_40.csv` (primary comparison) plus `examples_v1_120.csv` (full-v1 canonical extension)
+- freeze_status: `working frozen after two adjudication refresh passes plus final residual reread; full-v1 canonical gpt-5-mini run complete`
 - supporting_artifacts:
   - `reports/expanded_same_set_public_draft_20260413.md`
   - `reports/expanded_same_set_external_brief_20260413.md`
   - `reports/expanded_same_set_results_section_20260413.md`
   - `reports/annotation_freeze_notes_v1_40_20260413.md`
+  - `reports/health_reliability_eval_v1.md`
+  - `reports/full_v1_run_status_20260413.md`
   - `figures/real_v1_40_metric_comparison.svg`
   - `figures/real_v1_40_failure_count_comparison.svg`
+  - `runs/real_openai_gpt5mini_v1_120_20260413/summary.md`
 
 ## Abstract
 
@@ -135,6 +138,93 @@ Box 1 highlights two row types that best explain the frozen comparison.
 - both models: included personalization, risk-factor tailoring, and practical burden
 - remaining problem: both answers still sounded somewhat too positive, using language closer to `reasonable thing to try` than to a clearly selective-offer Grade `C` posture
 - interpretation: this row shows that even when models mention preferences, they may still overshoot the intended recommendation strength
+
+## Full-v1 canonical extension
+
+The `40`-row same-set comparison above was designed as a stress-test slice. To produce a canonical baseline for external comparison, the benchmark was expanded to a `120`-row frozen set (`examples_v1_120.csv`) and run against `gpt-5-mini` with the same judge, prompt, and rubric. The full-v1 set contains `16` Grade `A`, `24` Grade `B`, `32` Grade `C`, `16` Grade `D`, and `32` Grade `I` rows, distributed across the four task families (`direct_recommendation` `36`, `expert_explanation` `48`, `preference_sensitive` `16`, `uncertainty_elicitation` `20`). All `120` rows were judged by `gpt-5-mini` (OpenAI Responses API) using `prompts/judge_prompt.md`.
+
+### Canonical headline metrics (gpt-5-mini on examples_v1_120.csv)
+
+| metric | value |
+|---|---:|
+| `overall_rubric_score` (0-2) | `1.7633` |
+| `grade_fidelity_accuracy` | `0.8917` |
+| `C_grade_preference_omission_rate` | `0.5938` |
+| `I_statement_overrecommendation_rate` | `0.0312` |
+| `unsupported_directive_rate` | `0.0083` |
+
+### Dimension pattern (gpt-5-mini, full-v1)
+
+| dimension | mean (0-2) |
+|---|---:|
+| `recommendation_fidelity` | `1.875` |
+| `evidence_strength_and_uncertainty_fidelity` | `1.4917` |
+| `preference_sensitivity` | `1.55` |
+| `action_safety` | `1.975` |
+| `communication_clarity` | `1.925` |
+
+### Failure pattern (gpt-5-mini, full-v1, 120 rows)
+
+| failure label | count | note |
+|---|---:|---|
+| `missing uncertainty disclosure` | `39` | concentrated in `B` (11), `C` (19), `I` (6) |
+| `preference omission` | `33` | concentrated in `C` (19), `B` (8), `I` (4) |
+| `plausible but ungrounded claim` | `2` | one on `A`, one on `I` |
+| `grade deflation` | `1` | one `B` row |
+| `unsupported directive` | `1` | one `I` row |
+
+### Full-v1 interpretation
+
+The full-v1 canonical confirms and sharpens the `40`-row same-set finding. Action safety is high (`action_safety` mean `1.975`, `unsupported_directive_rate` `0.0083`), and directional grade fidelity is strong (`0.8917`). The benchmark's central concern — preservation of the *flavor* of a recommendation, not just its direction — is where `gpt-5-mini` systematically underperforms:
+
+- `C`-grade preference omission occurs on `19/32` rows (`59.4%`). On topics where patient values are decisive (shared decision-making), the model defaults to a declarative recommendation more often than not.
+- `missing uncertainty disclosure` is the single largest failure type at `39` occurrences. It is spread across grades but heaviest in the `B` and `C` bands, i.e. in recommendations that should be preserved *with* qualifying language rather than delivered as flat directives.
+- `I`-statement overrecommendation is contained (`1/32`, `3.1%`) — the model usually respects insufficient-evidence contexts.
+
+These results show that the failure signature observed on the `40`-row slice is not an artifact of slice selection: the same two dimensions — `preference_sensitivity` and `evidence_strength_and_uncertainty_fidelity` — score lowest on the larger canonical set, and the same two failure modes dominate the count distribution.
+
+### Why the full-v1 canonical matters
+
+The `40`-row slice is a paired comparison between `gpt-5-mini` and `gpt-5-nano`; the `120`-row set is a larger single-model baseline intended for cross-provider comparison. The two are complementary: the `40`-row slice showed that ordering between similar models within the same family can flip based on how many `C` and `I` rows are preserved; the `120`-row set gives the magnitude of the underlying failure surface at scale, independent of the ordering question. Subsequent model runs (including cross-provider) are intended to be scored against this `120`-row frozen set.
+
+## Cross-provider extension
+
+To test whether the failure signature observed on `gpt-5-mini` is GPT-family-specific or structural, the same `120`-row benchmark was run against `deepseek-chat` (DeepSeek V3). Judge model (`gpt-5-mini`), judge prompt, rubric, and benchmark items are held constant — only the target model varies. `deepseek-chat` was chosen as the contrast because it is trained on a substantially different pipeline (different origin, safety tuning, and instruction corpus from OpenAI) while retaining strong general instruction-following.
+
+### Cross-provider headline comparison
+
+| metric | gpt-5-mini | deepseek-chat | delta |
+|---|---:|---:|---:|
+| `overall_rubric_score` (0-2) | `1.7633` | `1.59` | `-0.173` |
+| `grade_fidelity_accuracy` | `0.8917` | `0.7333` | `-0.158` |
+| `C_grade_preference_omission_rate` | `0.5938` | `0.5938` | `0.000` |
+| `I_statement_overrecommendation_rate` | `0.0312` | `0.1875` | `+0.156` |
+| `unsupported_directive_rate` | `0.0083` | `0.0667` | `+0.058` |
+
+### Cross-provider failure-count comparison
+
+| failure label | gpt-5-mini | deepseek-chat |
+|---|---:|---:|
+| `missing uncertainty disclosure` | `39` | `55` |
+| `preference omission` | `33` | `32` |
+| `grade inflation` | `0` | `7` |
+| `grade deflation` | `1` | `3` |
+| `unsupported directive` | `1` | `8` |
+| `plausible but ungrounded claim` | `2` | `1` |
+
+### Three cross-provider findings
+
+**Finding 1 — The C-grade preference-omission pattern replicates exactly.** Both models miss preference on `19/32` C-grade rows (`59.4%`). Identical count, identical rate, on the same 120-row set, with two models from entirely different training pipelines. This is the single most externally-informative result: **preference omission on shared-decision rows is not a GPT-family tuning artifact** — it reproduces under a different pipeline with the same magnitude, which is consistent with a structural property of instruction-tuned LLMs rather than a vendor-specific choice. A plausible mechanism is generic RLHF reward shaping favoring confident declarative answers over preference-eliciting ones, but establishing that requires additional cross-provider data points.
+
+**Finding 2 — I-statement handling is where GPT-family tuning provides a real advantage.** `gpt-5-mini` overrecommends on insufficient-evidence rows `3.1%` of the time; `deepseek-chat` overrecommends `18.8%` of the time (≈`6×` higher). DeepSeek misses uncertainty disclosure on `20/32` I-grade rows (`62.5%`) vs `6/32` (`18.8%`) for `gpt-5-mini`, and adds `4` grade inflations and `6` unsupported directives specifically on I rows. This suggests that the tuning pipeline that produces GPT-5-class behavior does meaningful work on evidence-insufficient contexts — work that a generic strong instruction-tuned model does not inherit automatically. This finding is narrower than Finding 1: it establishes that the difference exists, not that it generalizes to every non-OpenAI provider.
+
+**Finding 3 — Unsupported-directive rate scales with uncertainty-disclosure failure.** DeepSeek's `8×` higher unsupported-directive rate tracks its `+16` higher missing-uncertainty-disclosure count. The two failures cluster on the same rows: when a model skips the uncertainty framing, it is more likely to also produce prescriptive action language. This is consistent with a single underlying failure mode — *posture flattening* — expressing itself as both missing hedges and overconfident directives.
+
+### Generalization caveat
+
+This is a two-provider comparison. Finding 1 is strongest because the identical-rate replication is striking even at n=2, but a third and fourth provider (Anthropic, Google, or an open Llama-family model) would meaningfully upgrade the claim from "consistent with a structural pattern" to "reproducible across four independent training pipelines." Findings 2 and 3 describe a gap between two specific models and should not be read as universal claims about OpenAI vs everyone else.
+
+
 
 ## Discussion
 

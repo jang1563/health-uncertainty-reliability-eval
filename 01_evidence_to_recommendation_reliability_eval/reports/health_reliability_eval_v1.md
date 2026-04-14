@@ -2,7 +2,7 @@
 
 - checked_on: `2026-04-13`
 - project: `Evidence-to-Recommendation Reliability Eval`
-- report_status: `full-v1 canonical run complete (120/120 rows scored on gpt-5-mini); expanded 40-row same-set comparison retained as stress test`
+- report_status: `full-v1 canonical run complete on gpt-5-mini (120/120); cross-provider extension complete on deepseek-chat (120/120, same judge); expanded 40-row same-set comparison retained as stress test`
 
 ## Report intent
 
@@ -104,6 +104,31 @@ The benchmark targets **recommendation-posture fidelity** — not general medica
 - **`I statement` overrecommendation is contained but non-zero.** `I_statement_overrecommendation_rate` is `0.0312` (1/32). The model generally respects evidence insufficiency, with one exception.
 - **The `preference_sensitivity` dimension (1.55) and `evidence_strength_and_uncertainty_fidelity` dimension (1.4917) are the lowest-scoring rubric dimensions**, consistent with the failure-count distribution.
 
+## Cross-provider extension (same 120-row benchmark, different target model)
+
+To test whether the canonical failure signature is GPT-family-specific or structural, the 120-row benchmark was re-run against `deepseek-chat` (DeepSeek V3) with the same judge (`gpt-5-mini`), same prompt, and same rubric.
+
+- run: `runs/real_deepseek_chat_v1_120_20260413`
+- model: `deepseek-chat` (DeepSeek V3)
+- judge: `gpt-5-mini` (OpenAI Responses API)
+- scored rows: `120/120`
+
+### Cross-provider headline comparison
+
+| metric | gpt-5-mini | deepseek-chat |
+|---|---:|---:|
+| `overall_rubric_score` | `1.7633` | `1.59` |
+| `grade_fidelity_accuracy` | `0.8917` | `0.7333` |
+| `C_grade_preference_omission_rate` | `0.5938` | **`0.5938`** (identical) |
+| `I_statement_overrecommendation_rate` | `0.0312` | `0.1875` (≈6× higher) |
+| `unsupported_directive_rate` | `0.0083` | `0.0667` (≈8× higher) |
+
+### Cross-provider headline finding
+
+**C-grade preference omission is identical on both models (`19/32` rows = `59.4%`)**, despite `gpt-5-mini` and `deepseek-chat` having entirely different training pipelines. When two models from different providers hit the same rate on the same rows, that is consistent with a structural failure mode of instruction-tuned LLMs on shared-decision-making content, not a GPT-family tuning artifact. This is the most externally-informative result of the cross-provider extension.
+
+DeepSeek is materially worse on `I`-statement handling (`6×` overrecommendation rate) and produces grade inflations (`7` cases) that `gpt-5-mini` does not. The detailed comparison is in [`reports/cross_provider_comparison_v1_120_20260413.md`](cross_provider_comparison_v1_120_20260413.md).
+
 ## Expanded 40-row same-set stress test
 
 The canonical result is accompanied by an independent 40-row same-set head-to-head (`examples_v1_40.csv`) between `gpt-5-mini` and `gpt-5-nano`. This slice was annotation-frozen after two adjudication refreshes and a final residual reread.
@@ -165,8 +190,8 @@ The full-v1 result on `gpt-5-mini` shows high action safety and strong direction
 
 ## Outstanding work
 
-1. Run the full-v1 canonical on a second provider (candidate: Anthropic `claude-haiku-4-5` or `claude-sonnet-4`) for cross-provider comparison on the same 120 items.
-2. Generate publication-ready PNG figures for the full-v1 result (metric bars, failure-count breakdown, per-grade failure heatmap). Current SVGs cover only the 20-row and 40-row runs.
-3. Update `reports/expanded_same_set_manuscript_draft_20260413.md` to add a full-v1 section now that the canonical result is available.
-4. Consider dual-human adjudication on the 14 rows that were re-judged after the initial quota-blocked retry, to confirm no systematic judge drift relative to the first-pass 106.
+1. Add a third provider (Anthropic `claude-haiku-4-5` or `claude-sonnet-4`) to test whether the identical C-grade preference-omission rate survives a third independent training pipeline. With three providers at ~59% C-grade omission, the structural-pattern claim becomes publishable.
+2. Add a fourth provider, ideally an open Llama-family model via Together or Groq, to establish whether the pattern survives training pipelines without vendor-specific health safety tuning.
+3. Generate publication-ready PNG figures for the full-v1 canonical and cross-provider comparison (metric bars, failure-count breakdown, per-grade heatmap).
+4. Consider dual-human adjudication on the 14 rows re-judged after the quota-blocked retry, to confirm no systematic judge drift relative to the first-pass 106.
 5. Decide whether to freeze v1 at the current 120-item set or expand to v1.1 (adjacent guideline sources, e.g. AAFP, ACP) before external release.
