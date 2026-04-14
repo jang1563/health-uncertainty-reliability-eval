@@ -2,7 +2,7 @@
 
 - checked_on: `2026-04-13`
 - project: `Evidence-to-Recommendation Reliability Eval`
-- report_status: `full-v1 canonical run complete on gpt-5-mini (120/120); cross-provider extension complete on deepseek-chat (120/120, same judge); expanded 40-row same-set comparison retained as stress test`
+- report_status: `full-v1 canonical run complete on gpt-5-mini (120/120); 3-way cross-provider comparison complete (gpt-5-mini + deepseek-chat + claude-haiku-4-5, all 120/120 with the same gpt-5-mini judge); expanded 40-row same-set comparison retained as stress test`
 
 ## Report intent
 
@@ -104,30 +104,37 @@ The benchmark targets **recommendation-posture fidelity** — not general medica
 - **`I statement` overrecommendation is contained but non-zero.** `I_statement_overrecommendation_rate` is `0.0312` (1/32). The model generally respects evidence insufficiency, with one exception.
 - **The `preference_sensitivity` dimension (1.55) and `evidence_strength_and_uncertainty_fidelity` dimension (1.4917) are the lowest-scoring rubric dimensions**, consistent with the failure-count distribution.
 
-## Cross-provider extension (same 120-row benchmark, different target model)
+## Cross-provider extension (same 120-row benchmark, three providers)
 
-To test whether the canonical failure signature is GPT-family-specific or structural, the 120-row benchmark was re-run against `deepseek-chat` (DeepSeek V3) with the same judge (`gpt-5-mini`), same prompt, and same rubric.
+The full-v1 canonical benchmark was run against three models from three different training pipelines, with judge, prompt, and rubric held constant.
 
-- run: `runs/real_deepseek_chat_v1_120_20260413`
-- model: `deepseek-chat` (DeepSeek V3)
-- judge: `gpt-5-mini` (OpenAI Responses API)
-- scored rows: `120/120`
+| run | model | provider |
+|---|---|---|
+| `runs/real_openai_gpt5mini_v1_120_20260413` | `gpt-5-mini` | OpenAI |
+| `runs/real_deepseek_chat_v1_120_20260413` | `deepseek-chat` | DeepSeek |
+| `runs/real_anthropic_haiku45_v1_120_20260413` | `claude-haiku-4-5-20251001` | Anthropic |
 
-### Cross-provider headline comparison
+All three runs are `120/120` scored by the same `gpt-5-mini` judge.
 
-| metric | gpt-5-mini | deepseek-chat |
-|---|---:|---:|
-| `overall_rubric_score` | `1.7633` | `1.59` |
-| `grade_fidelity_accuracy` | `0.8917` | `0.7333` |
-| `C_grade_preference_omission_rate` | `0.5938` | **`0.5938`** (identical) |
-| `I_statement_overrecommendation_rate` | `0.0312` | `0.1875` (≈6× higher) |
-| `unsupported_directive_rate` | `0.0083` | `0.0667` (≈8× higher) |
+### Three-way headline comparison
 
-### Cross-provider headline finding
+| metric | gpt-5-mini | deepseek-chat | claude-haiku-4-5 |
+|---|---:|---:|---:|
+| `overall_rubric_score` (0-2) | **`1.7633`** | `1.59` | `1.675` |
+| `grade_fidelity_accuracy` | **`0.8917`** | `0.7333` | `0.7833` |
+| `C_grade_preference_omission_rate` | `0.5938` | `0.5938` | **`0.4688`** |
+| `I_statement_overrecommendation_rate` | **`0.0312`** | `0.1875` | `0.1875` |
+| `unsupported_directive_rate` | **`0.0083`** | `0.0667` | `0.0583` |
 
-**C-grade preference omission is identical on both models (`19/32` rows = `59.4%`)**, despite `gpt-5-mini` and `deepseek-chat` having entirely different training pipelines. When two models from different providers hit the same rate on the same rows, that is consistent with a structural failure mode of instruction-tuned LLMs on shared-decision-making content, not a GPT-family tuning artifact. This is the most externally-informative result of the cross-provider extension.
+### Headline findings from three providers
 
-DeepSeek is materially worse on `I`-statement handling (`6×` overrecommendation rate) and produces grade inflations (`7` cases) that `gpt-5-mini` does not. The detailed comparison is in [`reports/cross_provider_comparison_v1_120_20260413.md`](cross_provider_comparison_v1_120_20260413.md).
+**Finding 1 — C-grade preference omission is high on every provider (47-59%), with Anthropic reducing it by about a quarter.** All three models miss preference on nearly half of C-grade rows or more. `gpt-5-mini` and `deepseek-chat` converge at an identical `59.4%` (`19/32`); `claude-haiku-4-5` is the best at `46.9%` (`15/32`). The failure mode replicates with similar magnitude across three entirely different training pipelines, but is partially addressable through tuning — even the best of three providers still omits preference on nearly half of preference-sensitive rows.
+
+**Finding 2 — GPT-5's I-statement calibration is distinctive, not generic "Western safety tuning".** A naive prior would predict both `gpt-5-mini` and `claude-haiku-4-5` to outperform `deepseek-chat` on insufficient-evidence rows. That prior is wrong: `claude-haiku-4-5` matches DeepSeek at `18.75%` I-statement overrecommendation, `6×` worse than `gpt-5-mini`. The advantage is OpenAI-specific at this model tier, not a general property of large safety-tuned models.
+
+**Finding 3 — Haiku uniquely over-hedges on Grade A rows.** `claude-haiku-4-5` is the only model that produced grade deflations on strong-evidence A-grade rows (`2/16`). The other two models produced zero A-row deflations. This is Haiku's distinctive failure signature, mirroring its strength on preference-sensitive rows.
+
+Full per-grade, per-dimension, per-failure decomposition is in [`reports/cross_provider_comparison_v1_120_20260413.md`](cross_provider_comparison_v1_120_20260413.md).
 
 ## Expanded 40-row same-set stress test
 
@@ -190,8 +197,9 @@ The full-v1 result on `gpt-5-mini` shows high action safety and strong direction
 
 ## Outstanding work
 
-1. Add a third provider (Anthropic `claude-haiku-4-5` or `claude-sonnet-4`) to test whether the identical C-grade preference-omission rate survives a third independent training pipeline. With three providers at ~59% C-grade omission, the structural-pattern claim becomes publishable.
-2. Add a fourth provider, ideally an open Llama-family model via Together or Groq, to establish whether the pattern survives training pipelines without vendor-specific health safety tuning.
-3. Generate publication-ready PNG figures for the full-v1 canonical and cross-provider comparison (metric bars, failure-count breakdown, per-grade heatmap).
-4. Consider dual-human adjudication on the 14 rows re-judged after the quota-blocked retry, to confirm no systematic judge drift relative to the first-pass 106.
-5. Decide whether to freeze v1 at the current 120-item set or expand to v1.1 (adjacent guideline sources, e.g. AAFP, ACP) before external release.
+1. Add `claude-sonnet-4` on the same 120 items to test whether Haiku's I-statement gap vs `gpt-5-mini` and its A-grade over-hedging are scale-sensitive within Anthropic's lineage.
+2. Add an open Llama-family model (e.g. `Llama-3.3-70B-Instruct` via Together or Groq) to test whether a model without vendor-specific health safety post-training lands near the Haiku end (`47%`) or the GPT/DeepSeek end (`59%`) of C-grade preference omission. This disambiguates vendor-tuning vs architecture as the source of the variation.
+3. Consider Gemini 2.5 Flash for a fourth independent training pipeline.
+4. Generate publication-ready PNG figures for the full-v1 canonical and three-way cross-provider comparison.
+5. Consider dual-human adjudication on the 14 rows re-judged after the quota-blocked retry, to confirm no systematic judge drift relative to the first-pass 106.
+6. Decide whether to freeze v1 at the current 120-item set or expand to v1.1 (adjacent guideline sources, e.g. AAFP, ACP) before external release.

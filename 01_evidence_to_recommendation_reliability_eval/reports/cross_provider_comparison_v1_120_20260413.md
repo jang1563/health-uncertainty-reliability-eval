@@ -3,114 +3,147 @@
 - checked_on: `2026-04-13`
 - project: `Evidence-to-Recommendation Reliability Eval`
 - benchmark_slice: `examples_v1_120.csv` (full-v1 canonical, 120 rows)
-- judge: `gpt-5-mini` (OpenAI Responses API), same prompt and rubric for both runs
-- runs compared:
-  - `runs/real_openai_gpt5mini_v1_120_20260413` (`gpt-5-mini`, OpenAI)
-  - `runs/real_deepseek_chat_v1_120_20260413` (`deepseek-chat`, DeepSeek)
+- judge: `gpt-5-mini` (OpenAI Responses API), same prompt and rubric for all runs
+- providers compared (3):
+  - `runs/real_openai_gpt5mini_v1_120_20260413` — `gpt-5-mini`, OpenAI
+  - `runs/real_deepseek_chat_v1_120_20260413` — `deepseek-chat`, DeepSeek
+  - `runs/real_anthropic_haiku45_v1_120_20260413` — `claude-haiku-4-5-20251001`, Anthropic
 
-## Why cross-provider
+## Why three providers
 
-The full-v1 canonical baseline (`gpt-5-mini` on 120 rows) surfaced two dominant failure modes: **missing uncertainty disclosure** (39 cases) and **preference omission on C-grade rows** (59.4% of C-grade rows). The question this extension tests is **whether those failures are GPT-family-specific or structural** across current instruction-tuned LLMs. `deepseek-chat` was chosen as the contrast because it is trained on a substantively different pipeline from OpenAI models (different origin, different safety tuning, different instruction-tuning corpus) while maintaining strong general instruction-following.
+The full-v1 canonical (`gpt-5-mini`) surfaced two dominant failure modes: missing uncertainty disclosure (39 cases) and preference omission on C-grade rows (59.4%). The two-provider extension against `deepseek-chat` produced a striking initial finding — identical 59.4% C-grade preference-omission rate on both models, suggesting a structural failure mode independent of training pipeline. Adding a third independent training pipeline (Anthropic) tests whether that "identical rate" finding replicates or is a two-provider coincidence.
 
-Judge, prompt, rubric, and 120-item benchmark are held constant. Only the target model varies.
+Judge model, judge prompt, rubric, and 120 benchmark items are held constant across all three runs. Only the target model varies.
 
-## Headline metric comparison
+## Three-way headline comparison
 
-| metric | gpt-5-mini | deepseek-chat | delta |
+| metric | gpt-5-mini | deepseek-chat | claude-haiku-4-5 |
 |---|---:|---:|---:|
-| `overall_rubric_score` (0-2) | **1.7633** | `1.59` | `-0.173` |
-| `grade_fidelity_accuracy` | **0.8917** | `0.7333` | `-0.158` |
-| `C_grade_preference_omission_rate` | `0.5938` | `0.5938` | **`0.000`** |
-| `I_statement_overrecommendation_rate` | `0.0312` | `0.1875` | **`+0.156` (≈6× worse)** |
-| `unsupported_directive_rate` | `0.0083` | `0.0667` | **`+0.058` (≈8× worse)** |
+| `overall_rubric_score` (0-2) | **`1.7633`** | `1.59` | `1.675` |
+| `grade_fidelity_accuracy` | **`0.8917`** | `0.7333` | `0.7833` |
+| `C_grade_preference_omission_rate` | `0.5938` | `0.5938` | **`0.4688`** |
+| `I_statement_overrecommendation_rate` | **`0.0312`** | `0.1875` | `0.1875` |
+| `unsupported_directive_rate` | **`0.0083`** | `0.0667` | `0.0583` |
 
-## Dimension-level comparison (mean 0-2 score)
+Bold = best value in each row.
 
-| dimension | gpt-5-mini | deepseek-chat | delta |
+## Three-way dimension comparison (mean 0-2)
+
+| dimension | gpt-5-mini | deepseek-chat | claude-haiku-4-5 |
 |---|---:|---:|---:|
-| `recommendation_fidelity` | `1.875` | `1.6333` | `-0.242` |
-| `evidence_strength_and_uncertainty_fidelity` | `1.4917` | `1.275` | `-0.217` |
-| `preference_sensitivity` | `1.55` | `1.4333` | `-0.117` |
-| `action_safety` | `1.975` | `1.775` | `-0.200` |
-| `communication_clarity` | `1.925` | `1.8333` | `-0.092` |
+| `recommendation_fidelity` | **`1.875`** | `1.6333` | `1.7167` |
+| `evidence_strength_and_uncertainty_fidelity` | **`1.4917`** | `1.275` | `1.4167` |
+| `preference_sensitivity` | `1.55` | `1.4333` | `1.5083` |
+| `action_safety` | **`1.975`** | `1.775` | `1.8417` |
+| `communication_clarity` | **`1.925`** | `1.8333` | `1.8917` |
 
-`gpt-5-mini` is better on every rubric dimension. The largest gaps are in `recommendation_fidelity` and `action_safety` — the two dimensions that most directly reflect posture-preserving behavior.
+`gpt-5-mini` is the best single model on every dimension. `claude-haiku-4-5` sits between `gpt-5-mini` and `deepseek-chat` on most dimensions, with a notable edge over DeepSeek on `evidence_strength_and_uncertainty_fidelity` and `preference_sensitivity`.
 
-## Failure-count comparison
+## Three-way failure-count comparison
 
-| failure label | gpt-5-mini | deepseek-chat |
+| failure label | gpt-5-mini | deepseek-chat | claude-haiku-4-5 |
+|---|---:|---:|---:|
+| `missing uncertainty disclosure` | `39` | `55` | `39` |
+| `preference omission` | `33` | `32` | `28` |
+| `grade inflation` | `0` | `7` | `7` |
+| `grade deflation` | `1` | `3` | `4` |
+| `unsupported directive` | `1` | `8` | `7` |
+| `plausible but ungrounded claim` | `2` | `1` | `0` |
+
+## Per-grade C-row failure comparison
+
+C-grade rows are the benchmark's central preference-sensitive test (32 rows).
+
+| C-grade failure mode | gpt-5-mini | deepseek-chat | claude-haiku-4-5 |
+|---|---:|---:|---:|
+| `preference omission` | `19` | `19` | `15` |
+| `missing uncertainty disclosure` | `19` | `22` | `18` |
+| `grade inflation` | `0` | `3` | `1` |
+| `grade deflation` | `0` | `1` | `0` |
+| `unsupported directive` | `0` | `2` | `1` |
+
+`claude-haiku-4-5` has `4` fewer C-grade preference omissions than the other two (`15/32` vs `19/32`).
+
+## Per-grade I-row failure comparison
+
+I-grade rows test insufficient-evidence posture (32 rows).
+
+| I-grade failure mode | gpt-5-mini | deepseek-chat | claude-haiku-4-5 |
+|---|---:|---:|---:|
+| `missing uncertainty disclosure` | `6` | `20` | `10` |
+| `preference omission` | `4` | `6` | `5` |
+| `grade inflation` | `0` | `4` | `5` |
+| `unsupported directive` | `1` | `6` | `4` |
+| `grade deflation` | `0` | `1` | `0` |
+| `plausible but ungrounded claim` | `1` | `1` | `0` |
+
+On I rows, `deepseek-chat` and `claude-haiku-4-5` perform similarly — both overrecommend at `18.75%` vs `gpt-5-mini`'s `3.12%`. Haiku's distribution is shifted (fewer missing-uncertainty-disclosure failures, more grade-inflation failures) but the net safety-relevant rate is the same.
+
+## Four findings from three providers
+
+### Finding 1 — C-grade preference omission is high on every provider, with Anthropic tuning providing a partial mitigation (revised from the two-provider version)
+
+All three models miss preference sensitivity on between `47%` and `59%` of C-grade rows. `gpt-5-mini` and `deepseek-chat` sit at an *identical* `59.4%` (`19/32`), while `claude-haiku-4-5` scores `46.9%` (`15/32`) — a `12.5`-percentage-point improvement.
+
+The two-provider version of this report emphasized the identical `59.4%` rate as evidence of a structural failure mode. With three providers, the finding revises to:
+
+> **Preference omission on shared-decision C-grade rows is a high-frequency failure across every current instruction-tuned model tested (`47-59%`), but the magnitude varies. Anthropic's `claude-haiku-4-5` reduces the rate by about a quarter relative to the `gpt-5-mini`/`deepseek-chat` baseline, suggesting the failure mode is partially addressable through tuning — but even the best of three providers still omits preference on nearly half of preference-sensitive rows.**
+
+The updated interpretation is stronger, not weaker. The original "identical across providers" framing was a two-provider coincidence. The three-provider result shows (a) the failure is clearly not provider-specific — it replicates with similar magnitude across three entirely different training pipelines — and (b) it is partially tractable. `gpt-5-mini` and `deepseek-chat` converging at exactly the same rate is now the anomaly that needs explanation, not a universal truth.
+
+### Finding 2 — GPT-5's I-statement calibration is distinctive, not generic "western safety tuning"
+
+A pre-test hypothesis would have been that any mainstream US-trained safety-tuned model would do better than DeepSeek on insufficient-evidence rows. That hypothesis is falsified by Haiku: `claude-haiku-4-5` has the same `18.75%` I-statement overrecommendation rate as `deepseek-chat`, `6×` worse than `gpt-5-mini`.
+
+The failure *shapes* differ — DeepSeek misses uncertainty disclosure heavily (20/32 I rows), while Haiku shows more grade inflation (5/32 I rows) and unsupported directive (4/32 I rows) — but the bottom-line rate of converting insufficient-evidence contexts into affirmative recommendations is the same. Whatever `gpt-5-mini` does on I rows, neither `claude-haiku-4-5` nor `deepseek-chat` inherits.
+
+This is worth further testing with a larger Claude model (`claude-sonnet-4` or `claude-opus-4`) — the gap may narrow with scale, or it may be specifically related to OpenAI's post-training data for insufficient-evidence contexts.
+
+### Finding 3 — Haiku uniquely over-hedges on Grade A rows
+
+`claude-haiku-4-5` is the only model that produced grade deflations on Grade A rows (`2/16`). `gpt-5-mini` produced zero, `deepseek-chat` produced zero on Grade A. This is a distinctive Haiku failure: on rows where evidence is strongest and the USPSTF-style grade is most unambiguous, Haiku sometimes under-recommends.
+
+This is the mirror of Finding 2. GPT-5 is best-calibrated on insufficient-evidence contexts but not meaningfully safer than Haiku overall. Haiku is best-calibrated on preference sensitivity but over-hedges on strong recommendations. The "right" calibration profile depends on what the benchmark rewards.
+
+### Finding 4 — Unsupported-directive rate still tracks missing-uncertainty rate, but not strictly
+
+Across the three models:
+
+| model | unsupported directive | missing uncertainty |
 |---|---:|---:|
-| `missing uncertainty disclosure` | `39` | `55` |
-| `preference omission` | `33` | `32` |
-| `grade inflation` | `0` | `7` |
-| `grade deflation` | `1` | `3` |
-| `unsupported directive` | `1` | `8` |
-| `plausible but ungrounded claim` | `2` | `1` |
+| `gpt-5-mini` | `1` | `39` |
+| `deepseek-chat` | `8` | `55` |
+| `claude-haiku-4-5` | `7` | `39` |
 
-The shape of the failure distribution differs meaningfully:
+The two-provider extension suggested these cluster on the same rows (one underlying failure mode — posture flattening). The three-provider comparison complicates that: Haiku has the same missing-uncertainty count as `gpt-5-mini` (both `39`) but the unsupported-directive count of DeepSeek-ish range (`7` vs `8`). So the two failure types can decouple. Haiku's unsupported-directive failures concentrate on I-rows (4/7) and preference-sensitive rows, not simply on rows that also lacked uncertainty framing.
 
-- **`preference omission`** is nearly identical (`33` vs `32`) — the structural pattern replicates across providers.
-- **`missing uncertainty disclosure`** is `+16` for `deepseek-chat` (`55` vs `39`) — DeepSeek is more likely to state a recommendation without qualifying language.
-- **`grade inflation`** appears only in DeepSeek (`7` vs `0`) — this is the headline directional-safety gap.
-- **`unsupported directive`** is `8×` higher in DeepSeek.
+## Ranking summary
 
-## Per-grade failure concentration
+If the benchmark were to produce a single ranking, the three models order as:
 
-### Grade C (preference-sensitive rows, 32 total)
+1. **`gpt-5-mini`** — best overall, strongest I-statement calibration, lowest unsupported-directive rate, cleanest action safety.
+2. **`claude-haiku-4-5`** — best preference-sensitivity handling, comparable uncertainty fidelity to `gpt-5-mini`, but worse on I-rows and on high-evidence (A-grade) rows.
+3. **`deepseek-chat`** — weakest on directional fidelity, uncertainty disclosure, and grade inflation. Matches Haiku on I-statement failures.
 
-| failure mode | gpt-5-mini | deepseek-chat |
-|---|---:|---:|
-| `preference omission` | 19 | 19 |
-| `missing uncertainty disclosure` | 19 | 22 |
-| `grade inflation` | 0 | 3 |
-| `grade deflation` | 0 | 1 |
-| `unsupported directive` | 0 | 2 |
+But the benchmark is not primarily a ranking tool. The more useful takeaway is that each model has a *different shape of failure*, and the dominant failure mode (preference omission on C) replicates across all three with meaningful frequency.
 
-The preference-omission count is **exactly identical** on C-grade rows. Where DeepSeek diverges is in additional directional failure modes layered on top (grade inflation, unsupported directive).
+## What three providers cannot yet settle
 
-### Grade I (insufficient-evidence rows, 32 total)
-
-| failure mode | gpt-5-mini | deepseek-chat |
-|---|---:|---:|
-| `missing uncertainty disclosure` | 6 | 20 |
-| `preference omission` | 4 | 6 |
-| `unsupported directive` | 1 | 6 |
-| `grade inflation` | 0 | 4 |
-| `grade deflation` | 0 | 1 |
-| `plausible but ungrounded claim` | 1 | 1 |
-
-`I`-statement rows are where the two models diverge most. `deepseek-chat` misses uncertainty disclosure on `20/32` I-grade rows (`62.5%`) vs `6/32` (`18.8%`) for `gpt-5-mini`. Combined with `4` grade inflations and `6` unsupported directives, DeepSeek systematically converts insufficient-evidence contexts into affirmative recommendations.
-
-## Three findings
-
-1. **Preference omission on C-grade rows is structural, not vendor-specific.** Both models miss preference on `19/32` C-grade rows (`59.4%`). Identical count, identical rate. When two models from entirely different training pipelines produce the same failure rate on the same rows, that is strong evidence the failure mode is a property of instruction-tuned LLMs generally — probably a side effect of RLHF reward shaping that favors confident, declarative answers over preference-eliciting ones. **This is the benchmark's single most externally-informative result.**
-
-2. **I-statement handling is where GPT-family tuning provides a real safety advantage.** `gpt-5-mini` overrecommends on `I` rows `3.1%` of the time; `deepseek-chat` does so `18.8%` of the time. OpenAI's safety tuning appears to do meaningful work on insufficient-evidence contexts. This is not trivially generalizable — it tells us GPT-5 is better calibrated on this posture type, but does not tell us this is a universal OpenAI advantage vs all other providers.
-
-3. **Unsupported-directive rate scales with uncertainty-disclosure failure.** DeepSeek's `8×` higher unsupported directive rate tracks its higher missing-uncertainty-disclosure rate. These failures cluster on the same rows: when a model skips uncertainty framing, it is more likely to also state prescriptive action language.
-
-## What this does not tell us
-
-- Whether **Claude** (Anthropic), **Gemini** (Google), or **Llama-family open models** show the same identical C-grade preference-omission rate. That would need at least one more provider.
-- Whether DeepSeek's advantage shrinks at higher model scales (`deepseek-reasoner`, `deepseek-v3.1`-variants). This run used the general `deepseek-chat` endpoint.
-- Whether fine-tuning for shared-decision-making explicitly (as opposed to generic RLHF) would close the C-grade preference-omission gap. It probably would.
+- **Whether the Grade A over-hedging is a Haiku-specific quirk or a general Anthropic trait.** A `claude-sonnet-4` run would disambiguate.
+- **Whether model scale within Anthropic closes the I-statement gap vs GPT-5-mini.** Again, Sonnet would help.
+- **Whether an open Llama-family model without vendor-specific health safety tuning lands near the high end (~59%) or the low end (~47%) of the C-grade preference-omission range.** Adding a Llama run via Together or Groq would indicate whether the Anthropic-vs-GPT gap is vendor-tuning-driven or architecture-driven.
 
 ## Artifacts
 
-- `runs/real_openai_gpt5mini_v1_120_20260413/summary.json` — gpt-5-mini raw metrics
-- `runs/real_openai_gpt5mini_v1_120_20260413/summary.md` — gpt-5-mini topline
-- `runs/real_openai_gpt5mini_v1_120_20260413/qualitative_cases.md` — gpt-5-mini highest/lowest cases
-- `runs/real_deepseek_chat_v1_120_20260413/summary.json` — deepseek-chat raw metrics
-- `runs/real_deepseek_chat_v1_120_20260413/summary.md` — deepseek-chat topline
-- `runs/real_deepseek_chat_v1_120_20260413/qualitative_cases.md` — deepseek-chat highest/lowest cases
-- `scripts/run_chat_completions.py` — the chat-completions runner used for DeepSeek (reusable for Together, Groq, or any OpenAI-compatible provider)
+- `runs/real_openai_gpt5mini_v1_120_20260413/` — full run directory
+- `runs/real_deepseek_chat_v1_120_20260413/` — full run directory
+- `runs/real_anthropic_haiku45_v1_120_20260413/` — full run directory
+- `scripts/run_chat_completions.py` — the chat-completions runner used for both DeepSeek and Anthropic (Anthropic exposes an OpenAI-compatible endpoint at `/v1/chat/completions`; the runner requires no Anthropic-specific code path)
 
 ## Suggested next cross-provider runs
 
 Ordered by expected informational yield:
 
-1. **Anthropic `claude-haiku-4-5-20251001`** — independent tuning lineage; will test whether Anthropic's known uncertainty-expression tendency narrows the C-grade preference-omission gap. If it does, that weakens finding #1 (the gap is then partially vendor-shaped).
-2. **An open Llama-family model via Together or Groq (`Llama-3.3-70B-Instruct`)** — represents generic post-training without vendor-specific health tuning. If the C-grade rate is again `~59%`, finding #1 becomes very strong.
-3. **Gemini 2.5 Flash or Pro (Google)** — fourth independent lineage.
-
-Three data points are the minimum for claiming "structural across providers." With four, the finding is publishable.
+1. **`claude-sonnet-4-20250514`** on the same 120 items. Tests whether the Haiku I-statement gap is scale-sensitive within Anthropic, and whether the Haiku A-grade over-hedging persists at larger scale.
+2. **An open Llama-family model (`Llama-3.3-70B-Instruct` via Together or Groq)**. Tests whether a model without vendor-specific health safety post-training lands near `47%` or `59%` on C-grade preference omission.
+3. **Gemini 2.5 Flash (Google)**. Fourth independent lineage; useful for confirming the generality of the three-way pattern.

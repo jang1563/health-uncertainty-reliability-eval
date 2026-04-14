@@ -3,7 +3,7 @@
 - checked_on: `2026-04-13`
 - working_title: `Evidence-to-Recommendation Reliability Eval`
 - parent_artifact_family: `Health Uncertainty and Reliability Eval`
-- status: `full-v1 canonical run complete on gpt-5-mini (120/120); cross-provider extension complete on deepseek-chat (120/120, same judge); six real runs complete; expanded same-set freeze review recorded`
+- status: `full-v1 canonical run complete on gpt-5-mini (120/120); 3-way cross-provider comparison complete (gpt-5-mini + deepseek-chat + claude-haiku-4-5, all 120/120 under same gpt-5-mini judge); seven real runs complete; expanded same-set freeze review recorded`
 
 ## Purpose
 
@@ -137,9 +137,10 @@ That is, this is **not** a `recommendation generation system` and **not** a `cli
 - `runs/real_openai_gpt5mini_v1_40_20260412` has also been generated and scored on the same-set.
 - `runs/real_run_v1_120_template_20260413` is initialized as the full-v1 canonical run template.
 - `runs/real_openai_gpt5mini_v1_120_20260413` has `120/120` generation complete and `120/120` judged rows scored (canonical full-v1 baseline).
-- `runs/real_deepseek_chat_v1_120_20260413` has `120/120` generation and `120/120` judged rows scored on `deepseek-chat` with the same `gpt-5-mini` judge (cross-provider extension).
-- The `response -> annotation sheet -> summary report` pipeline has scripts and templates included, including `scripts/run_chat_completions.py` for any OpenAI-compatible provider (DeepSeek, Together, Groq, etc.).
-- Six real model runs are complete, including the full-v1 canonical and a cross-provider extension.
+- `runs/real_deepseek_chat_v1_120_20260413` has `120/120` generation and `120/120` judged rows scored on `deepseek-chat` with the same `gpt-5-mini` judge.
+- `runs/real_anthropic_haiku45_v1_120_20260413` has `120/120` generation and `120/120` judged rows scored on `claude-haiku-4-5-20251001` with the same `gpt-5-mini` judge (three-provider cross-provider comparison).
+- The `response -> annotation sheet -> summary report` pipeline has scripts and templates included, including `scripts/run_chat_completions.py` for any OpenAI-compatible provider. Anthropic's OpenAI-compatible endpoint is used directly; no provider-specific code path is needed.
+- Seven real model runs are complete, including the full-v1 canonical and a three-provider cross-provider comparison.
 - The `gpt-5-mini` vs `gpt-5-nano` same-set head-to-head on the expanded candidate set is complete.
 - An annotation sanity-check queue has been produced for the expanded same-set results.
 - The residual 3-row sanity-check queue is finished through final reread; the current official annotation sheet is treated as the working frozen version.
@@ -158,10 +159,11 @@ That is, this is **not** a `recommendation generation system` and **not** a `cli
 
 ## Immediate next steps
 
-1. Add a third provider (Anthropic `claude-haiku-4-5` or `claude-sonnet-4`) to test whether the identical `59.4%` C-grade preference-omission rate survives a third independent training pipeline.
-2. Add a fourth provider (ideally an open Llama-family model via Together or Groq) for a four-lineage test of the structural-pattern claim.
-3. Generate publication-ready PNG figures for the full-v1 canonical and cross-provider comparison.
-4. Keep the expanded `40`-row same-set results as the manuscript package and stress-test reference.
+1. Add `claude-sonnet-4` on the same 120 items to test whether Haiku's I-statement gap vs `gpt-5-mini` and its A-grade over-hedging are scale-sensitive within Anthropic's lineage.
+2. Add an open Llama-family model (`Llama-3.3-70B-Instruct` via Together or Groq) to test whether a model without vendor-specific health safety post-training lands near the Haiku end (`47%`) or the GPT/DeepSeek end (`59%`) of C-grade preference omission.
+3. Consider Gemini 2.5 Flash for a fourth independent training pipeline.
+4. Generate publication-ready PNG figures for the full-v1 canonical and three-way cross-provider comparison.
+5. Keep the expanded `40`-row same-set results as the manuscript package and stress-test reference.
 
 ## License
 
