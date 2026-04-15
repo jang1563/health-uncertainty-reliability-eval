@@ -1,0 +1,18 @@
+{
+  "run_name": "real_anthropic_sonnet46_v1_120_20260414",
+  "checked_on": "2026-04-10",
+  "project": "Evidence-to-Recommendation Reliability Eval",
+  "run_type": "real_model_run",
+  "model_name": "claude-sonnet-4-6",
+  "provider": "Anthropic",
+  "prompt_version": "minimal_patient_facing_system_prompt_v1",
+  "examples_source": "data/examples_v1_120.csv",
+  "prompt_pack_source": "data/examples_v1_120_prompt_pack.jsonl",
+  "annotation_guide": "docs/annotation_guide.md",
+  "judge_prompt": "prompts/judge_prompt.md",
+  "notes": [
+    "Fill model_name and provider before publishing results.",
+    "Do not present demo runs as external model results."
+  ],
+  "api_base": "https://api.anthropic.com/v1"
+}

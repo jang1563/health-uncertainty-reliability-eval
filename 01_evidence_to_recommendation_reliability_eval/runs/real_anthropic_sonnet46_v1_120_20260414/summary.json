@@ -1,0 +1,107 @@
+{
+  "annotation_path": "runs/real_anthropic_sonnet46_v1_120_20260414/annotation_sheet.csv",
+  "total_rows": 120,
+  "scored_rows": 119,
+  "overall_rubric_score": 1.6286,
+  "grade_fidelity_accuracy": 0.8655,
+  "C_grade_preference_omission_rate": 0.0938,
+  "I_statement_overrecommendation_rate": 0.125,
+  "unsupported_directive_rate": 0.0756,
+  "average_score_by_dimension": {
+    "recommendation_fidelity": 1.7815,
+    "evidence_strength_and_uncertainty_fidelity": 1.8319,
+    "preference_sensitivity": 0.8908,
+    "action_safety": 1.9412,
+    "communication_clarity": 1.6975
+  },
+  "benchmark_row_count_by_grade": {
+    "A": 16,
+    "B": 24,
+    "C": 32,
+    "D": 16,
+    "I": 32
+  },
+  "benchmark_row_count_by_task_family": {
+    "direct_recommendation": 36,
+    "expert_explanation": 48,
+    "preference_sensitive": 16,
+    "uncertainty_elicitation": 20
+  },
+  "row_count_by_grade": {
+    "A": 15,
+    "B": 24,
+    "C": 32,
+    "D": 16,
+    "I": 32
+  },
+  "row_count_by_task_family": {
+    "direct_recommendation": 36,
+    "expert_explanation": 47,
+    "preference_sensitive": 16,
+    "uncertainty_elicitation": 20
+  },
+  "failure_count_overall": {
+    "grade deflation": 3,
+    "grade inflation": 4,
+    "missing uncertainty disclosure": 6,
+    "preference omission": 61,
+    "unsupported directive": 9
+  },
+  "failure_count_by_grade": {
+    "A": {
+      "preference omission": 11,
+      "unsupported directive": 1
+    },
+    "B": {
+      "grade deflation": 1,
+      "missing uncertainty disclosure": 2,
+      "preference omission": 8,
+      "unsupported directive": 2
+    },
+    "C": {
+      "grade deflation": 1,
+      "missing uncertainty disclosure": 1,
+      "preference omission": 3,
+      "unsupported directive": 2
+    },
+    "D": {
+      "grade inflation": 1,
+      "preference omission": 13,
+      "unsupported directive": 2
+    },
+    "I": {
+      "grade deflation": 1,
+      "grade inflation": 3,
+      "missing uncertainty disclosure": 3,
+      "preference omission": 26,
+      "unsupported directive": 2
+    }
+  },
+  "failure_count_by_task_family": {
+    "direct_recommendation": {
+      "grade deflation": 1,
+      "missing uncertainty disclosure": 2,
+      "preference omission": 17,
+      "unsupported directive": 5
+    },
+    "expert_explanation": {
+      "grade inflation": 2,
+      "missing uncertainty disclosure": 2,
+      "preference omission": 26,
+      "unsupported directive": 2
+    },
+    "preference_sensitive": {
+      "grade deflation": 1,
+      "missing uncertainty disclosure": 1,
+      "preference omission": 2,
+      "unsupported directive": 1
+    },
+    "uncertainty_elicitation": {
+      "grade deflation": 1,
+      "grade inflation": 2,
+      "missing uncertainty disclosure": 1,
+      "preference omission": 16,
+      "unsupported directive": 1
+    }
+  }
+}
