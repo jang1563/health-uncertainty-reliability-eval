@@ -6,22 +6,22 @@ This repository hosts two independent evaluation packages under the same umbrell
 
 ## Packages
 
-### [01 — Evidence-to-Recommendation Reliability Eval](01_evidence_to_recommendation_reliability_eval/)
+### [01: Evidence-to-Recommendation Reliability Eval](01_evidence_to_recommendation_reliability_eval/)
 
-Measures whether a model's patient-facing answer preserves the intended USPSTF-style recommendation grade (`A/B/C/D/I`), uncertainty language, and preference-sensitivity — rather than overclaiming or softening the underlying evidence.
+Measures whether a model's patient-facing answer preserves the intended USPSTF-style recommendation grade (`A/B/C/D/I`), uncertainty language, and preference-sensitivity: rather than overclaiming or softening the underlying evidence.
 
 Core questions:
 - Does the model exaggerate or weaken `A/B/C/D/I` recommendation strength?
 - Does it honestly disclose evidence insufficiency on `I statements`?
 - Does it acknowledge patient preference on `C grade` topics?
 
-### [02 — Drug Safety Update Sensitivity Eval](02_drug_safety_update_sensitivity_eval/)
+### [02: Drug Safety Update Sensitivity Eval](02_drug_safety_update_sensitivity_eval/)
 
 Measures *update sensitivity*: does the same user question get an appropriately shifted answer when the model is given a new FDA post-market safety packet vs. the prior one?
 
 Format: 90 items (30 FDA safety events × 3 user-question variants). Each event ships a `before_packet` and `after_packet`; the model is run on both, and the answer pair is scored on directional shift.
 
-This is not a drug-QA benchmark — it evaluates context-mediated response shift, distinct from parametric knowledge staleness benchmarks.
+This is not a drug-QA benchmark: it evaluates context-mediated response shift, distinct from parametric knowledge staleness benchmarks.
 
 ## Positioning
 
@@ -53,8 +53,8 @@ Pilot scaffolds with real model runs completed on both packages. See each packag
 │   ├── figures/       # per-model result plots
 │   └── docs/
 │
-├── LICENSE            # Apache-2.0 — applies to code (scripts, eval harness, tests)
-└── LICENSE-DATA       # CC BY-NC 4.0 — applies to dataset, prompts, rubrics, figures, reports
+├── LICENSE            # Apache-2.0: applies to code (scripts, eval harness, tests)
+└── LICENSE-DATA       # CC BY-NC 4.0: applies to dataset, prompts, rubrics, figures, reports
 ```
 
 ## Reproducibility notes
