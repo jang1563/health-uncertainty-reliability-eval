@@ -40,9 +40,3 @@
 - `the first FDA benchmark`
 - `real-world pharmacovigilance system`
 - `regulatory-grade deployment tool`
-
-## 채용 포지셔닝 관점의 장점
-
-- Health AI role에서 중요한 `time-sensitive reliability`를 직접 보여준다.
-- static knowledge benchmark보다 더 현실적인 safety framing을 준다.
-- 기존 biosecurity / eval portfolio와 자연스럽게 연결되면서도 distinctly health-facing이다.

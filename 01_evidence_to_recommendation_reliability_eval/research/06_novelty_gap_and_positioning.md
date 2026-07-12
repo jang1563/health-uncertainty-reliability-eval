@@ -42,9 +42,3 @@
 - `the first benchmark for preventive care`
 - `doctor-level recommendation benchmark`
 - `clinical deployment-grade`
-
-## 채용 포지셔닝 관점의 장점
-
-- OpenAI Health AI role에 맞는 `evaluation design` 역량을 직접 보여준다.
-- medical assistant demo보다 더 안전하고 recruiter-legible하다.
-- 기존 `BioEval`, `BioReview`, `BioThreat-Eval`과 결이 맞으면서도 health-native framing이 더 선명하다.
