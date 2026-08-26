@@ -128,6 +128,7 @@ eval/
   output/                  # Per-model eval_results.jsonl + run_manifest.json
 scripts/
   build_comparison_report.py
+  build_manuscript_report.py
   run_judge_sensitivity.py # Sonnet judge-sensitivity validation subset
   sanitize_manifests.py    # Dev helper: rewrite manifest paths to project-relative
   generate_remaining_events.py  # Dataset-build helper used during v1 construction
@@ -141,6 +142,7 @@ tests/
 reports/
   v1_results_summary.md                     # Top-level summary of all runs
   cross_model_comparison.md                 # Detailed side-by-side analysis
+  manuscript_style_results_draft.md         # Manuscript-style synthesis of benchmark results
   haiku_v2.md                               # claude-haiku-4-5-20251001
   gpt4o_mini.md                             # gpt-4o-mini
   gpt5_nano.md                              # gpt-5-nano
@@ -154,9 +156,21 @@ research/                  # Research pack (8 documents)
 
 ## Running the Evaluation
 
+Requirements: Python 3.8+ and either an Anthropic or OpenAI API key.
+
 ```bash
+# Clone and set up a virtual environment
+git clone https://github.com/jang1563/drug-safety-update-sensitivity-eval.git
+cd drug-safety-update-sensitivity-eval
+python3 -m venv .venv
+source .venv/bin/activate
+
 # Install dependencies
 pip install -r eval/requirements.txt
+
+# Run tests (optional)
+pip install pytest
+pytest tests/ -v
 
 # Run full evaluation (90 items)
 python eval/run_eval.py --model claude-sonnet-4-20250514 --judge claude-sonnet-4-20250514
@@ -172,6 +186,14 @@ python eval/report_generator.py eval/output/eval_results.jsonl
 
 # Generate synthetic outputs without API calls
 python eval/run_mock_eval.py --output eval/output/mock_run
+
+# Build the manuscript-style benchmark draft from completed runs
+python scripts/build_manuscript_report.py \
+  --run "haiku_v2=eval/output/haiku_v2/eval_results.jsonl" \
+  --run "gpt-4o-mini=eval/output/gpt4o_mini/eval_results.jsonl" \
+  --run "gpt-5-nano=eval/output/gpt5_nano/eval_results.jsonl" \
+  --judge-sensitivity eval/output/judge_sensitivity_sonnet_subset/rejudged_scores.jsonl \
+  --output reports/manuscript_style_results_draft.md
 
 # Re-judge a curated 10-item subset with Sonnet for judge-sensitivity validation
 .venv/bin/python3 scripts/run_judge_sensitivity.py \
@@ -189,23 +211,31 @@ Each evaluation run also writes `run_manifest.json` into the chosen output direc
 
 - [v1 Results Summary](reports/v1_results_summary.md) — compact topline benchmark outcomes and judge-sensitivity summary
 - [Cross-Model Comparison](reports/cross_model_comparison.md) — detailed side-by-side analysis across the three evaluated models
+- [Manuscript-Style Results Draft](reports/manuscript_style_results_draft.md) — paper-planning synthesis of the current benchmark outcomes
 - [Methodology](docs/methodology.md) — evaluation protocol, packet templates, rubric definitions
 - [Limitations](docs/limitations.md) — known limitations and scope boundaries
 - [Judge Sensitivity Report](reports/judge_sensitivity_sonnet_subset.md) — 10-case Sonnet re-judging subset across completed model runs
 
 ## Citing
 
-If you use this benchmark, please cite this repository.
+If you use this benchmark, please cite:
+
+```
+Kim, J. (2026). Drug Safety Update Sensitivity Eval (v1.0.0) [Dataset].
+https://github.com/jang1563/drug-safety-update-sensitivity-eval
+```
+
+Machine-readable citation metadata is in [CITATION.cff](CITATION.cff).
 
 ## License
 
-This package is covered by the repository's top-level split license:
+This repository uses a split license:
 
-- **Code** (`eval/`, `scripts/`, `tests/`, all `.py` files) — [Apache License 2.0](../LICENSE).
-- **Data, prompts, rubrics, figures, reports, research** (`data/`, `docs/`, `figures/`, `reports/`, `research/`, all `.md`/`.csv`/`.jsonl`/`.json`/`.png`/`.svg`) — [Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)](../LICENSE-DATA).
+- **Code** (`eval/`, `scripts/`, `tests/`, all `.py` files) — [Apache License 2.0](LICENSE).
+- **Data, prompts, rubrics, figures, reports, research** (`data/`, `docs/`, `figures/`, `reports/`, `research/`, all `.md`/`.csv`/`.jsonl`/`.json`/`.png`/`.svg`) — [Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)](LICENSE-DATA).
 
 **Non-profit / academic / personal use**: free under the terms above, with attribution.
 
-**For-profit / commercial use of the dataset, prompts, or rubrics**: requires a separate commercial license. Contact the author (see [CITATION.cff](../CITATION.cff)) for commercial licensing.
+**For-profit / commercial use of the dataset, prompts, or rubrics**: requires a separate commercial license. Contact the author (see [CITATION.cff](CITATION.cff)) for commercial licensing.
 
 FDA source documents referenced in the benchmark are public U.S. government information; benchmark packets are human-authored paraphrases with source URLs preserved (see [Source Policy](#source-policy)).

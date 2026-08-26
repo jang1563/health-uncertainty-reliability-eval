@@ -1,46 +1,31 @@
 # Figures
 
-- checked_on: `2026-04-12`
+- checked_on: `2026-04-16`
 - project: `Evidence-to-Recommendation Reliability Eval`
-- status: `demo and real-run svg figures created`
+- status: `canonical and cross-provider SVG source figures plus PNG release companions tracked`
 
-## 예정 산출물
+## Canonical Release Figures
 
-- `grade_fidelity_summary.png`
-- `failure_taxonomy_breakdown.png`
-- `c_vs_i_error_profile.png`
+- `full_v1_canonical_metric_comparison.svg`
+- `full_v1_canonical_metric_comparison.png`
+- `full_v1_canonical_failure_count_comparison.svg`
+- `full_v1_canonical_failure_count_comparison.png`
+- `full_v1_cross_provider_metric_comparison.svg`
+- `full_v1_cross_provider_metric_comparison.png`
+- `full_v1_cross_provider_failure_count_comparison.svg`
+- `full_v1_cross_provider_failure_count_comparison.png`
+
+## Supporting Figures
+
 - `demo_run_metric_comparison.svg`
 - `demo_failure_count_comparison.svg`
 - `real_run_metric_comparison.svg`
-- `real_failure_count_comparison.svg`
+- `real_run_failure_count_comparison.svg`
 - `real_v1_40_metric_comparison.svg`
 - `real_v1_40_failure_count_comparison.svg`
 
-## 현재 상태
+## Notes
 
-- 실제 external model PNG figure는 아직 생성되지 않았다.
-- smoke-test demo run 기준 SVG figure와 real run 비교 SVG figure는 생성되어 저장된다.
-
-## 권장 figure 내용
-
-- `grade_fidelity_summary.png`
-  - grade별 평균 rubric score
-  - grade inflation / deflation count
-- `failure_taxonomy_breakdown.png`
-  - failure taxonomy stacked bar
-  - task family별 분포
-- `c_vs_i_error_profile.png`
-  - `C`에서의 preference omission
-  - `I`에서의 false certainty 또는 overrecommendation
-- `demo_run_metric_comparison.svg`
-  - reference run과 overconfident baseline의 핵심 metric 비교
-- `demo_failure_count_comparison.svg`
-  - demo run별 failure taxonomy count 비교
-- `real_run_metric_comparison.svg`
-  - `gpt-5-mini`와 `gpt-5-nano`의 핵심 metric 비교
-- `real_failure_count_comparison.svg`
-  - real run별 failure taxonomy count 비교
-- `real_v1_40_metric_comparison.svg`
-  - expanded `40`-row same-set `gpt-5-mini` vs `gpt-5-nano` metric 비교
-- `real_v1_40_failure_count_comparison.svg`
-  - expanded `40`-row same-set failure taxonomy count 비교
+- SVG remains the source-of-truth editable format.
+- PNG exists for release packaging and easy embedding.
+- The `40`-row figures are supporting stress-test artifacts, not the primary benchmark figures.

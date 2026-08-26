@@ -1,167 +1,248 @@
 # Real Run Playbook
 
-- checked_on: `2026-04-13`
+- checked_on: `2026-04-16`
 - project: `Evidence-to-Recommendation Reliability Eval`
-- audience: `future self or collaborator running the first real model benchmark`
+- audience: `collaborator running or releasing a benchmark run`
 
-## 목적
+## Goal
 
-이 문서는 실제 외부 모델 run을 시작해서 결과를 benchmark artifact로 남길 때의 최소 작업 순서를 정리한다.
+This document describes the canonical `clone -> run -> judge -> adjudicate -> summarize -> release` path for the current repository state.
 
-## 빠른 순서
+## Fast Path
 
-1. 새 run 디렉터리 생성
-2. `outputs.csv`에 실제 모델 응답 채우기
-3. `annotation_sheet.csv` 생성
-4. annotation 수행
-5. summary와 qualitative case 생성
-6. report에 real run 결과 반영
-7. same-set head-to-head면 review queue 생성
+1. initialize a run directory
+2. fill `outputs.csv`
+3. build `annotation_sheet.csv`
+4. score with the judge or a human reviewer
+5. finalize the run
+6. if needed, build a blinded adjudication packet
+7. if needed, build a reviewer disagreement brief
+8. render SVG + PNG figures
+9. run release readiness checks
 
-## 1. run 디렉터리 생성
-
-```bash
-cd 01_evidence_to_recommendation_reliability_eval
-python3 scripts/init_run_dir.py \
-  --run-name real_PROVIDER_MODEL_YYYYMMDD \
-  --runs-root runs
-```
-
-확장 benchmark set을 쓰고 싶다면 아래처럼 dataset을 함께 지정한다.
+## 1. Initialize A Run
 
 ```bash
-python3 scripts/init_run_dir.py \
-  --run-name real_PROVIDER_MODEL_v1_40_YYYYMMDD \
-  --runs-root runs \
-  --examples data/examples_v1_40.csv \
-  --prompt-pack data/examples_v1_40_prompt_pack.jsonl
-```
-
-full v1 `120`-row run을 시작할 때는 아래를 사용한다.
-
-```bash
-python3 scripts/init_run_dir.py \
+python scripts/init_run_dir.py \
   --run-name real_PROVIDER_MODEL_v1_120_YYYYMMDD \
   --runs-root runs \
   --examples data/examples_v1_120.csv \
   --prompt-pack data/examples_v1_120_prompt_pack.jsonl
 ```
 
-생성 결과:
+Generated files:
 
-- `runs/<run_name>/manifest.json`
-- `runs/<run_name>/outputs.csv`
-- `runs/<run_name>/notes.md`
+- `manifest.json`
+- `outputs.csv`
+- `notes.md`
 
-## 2. outputs.csv 채우기
+## 2. Fill `outputs.csv`
 
-필수 컬럼:
+Required columns:
 
 - `example_id`
 - `model_name`
 - `response_text`
 
-원칙:
+You can fill the file manually or use an API runner.
 
-- row 순서는 바꿔도 되지만 `example_id`는 유지
-- 동일 prompt set을 사용
-- system prompt 변경 시 `manifest.json`에 기록
-
-OpenAI Responses API를 쓸 경우 아래처럼 바로 채울 수 있다.
+OpenAI Responses example:
 
 ```bash
-python3 scripts/run_openai_responses.py \
+python scripts/run_openai_responses.py \
   --run-dir runs/<run_name> \
   --model gpt-5-mini
 ```
 
-이 스크립트는 아래를 사용한다.
-
-- `OPENAI_API_KEY`
-- `manifest.json`의 `prompt_pack_source` 또는 override한 prompt pack
-- `runs/<run_name>/outputs.csv`
-
-## 3. annotation sheet 생성
+## 3. Build `annotation_sheet.csv`
 
 ```bash
-python3 scripts/prepare_run_dir.py \
+python scripts/prepare_run_dir.py \
   --run-dir runs/<run_name>
 ```
 
-생성 결과:
+This uses the run manifest by default.
 
-- `runs/<run_name>/annotation_sheet.csv`
+## 4. Score The Run
 
-기본적으로 `manifest.json`의 `examples_source`를 사용한다.
-다른 파일을 강제로 쓰고 싶다면 `--examples`로 override할 수 있다.
-
-## 4. annotation 수행
-
-annotation은 아래를 기준으로 한다.
-
-- `docs/annotation_guide.md`
-- `prompts/judge_prompt.md`
-
-score는 `0/1/2`만 사용한다.
-
-## 5. summary와 qualitative case 생성
+Primary judge path:
 
 ```bash
-python3 scripts/finalize_run_dir.py \
+python scripts/judge_annotations_openai.py \
+  --run-dir runs/<run_name> \
+  --model gpt-5-mini
+```
+
+Important release-candidate behavior:
+
+- full response text is used first
+- fallback truncation is only a recovery path
+- `judge_metadata.json` records whether truncation happened
+
+For the tracked sensitivity-judge workflow on an adjudication packet, run:
+
+```bash
+python scripts/run_judge_sensitivity.py \
+  --run-dir runs/real_anthropic_sonnet46_v1_120_20260414
+```
+
+## 5. Finalize The Run
+
+```bash
+python scripts/finalize_run_dir.py \
   --run-dir runs/<run_name>
 ```
 
-생성 결과:
+Generated files:
 
-- `runs/<run_name>/summary.json`
-- `runs/<run_name>/summary.md`
-- `runs/<run_name>/qualitative_cases.md`
+- `summary.json`
+- `summary.md`
+- `qualitative_cases.md`
 
-## 6. report 반영
+The current summaries include:
 
-real run이 생기면 아래 문서를 업데이트한다.
+- bootstrap confidence intervals
+- provisional flags
+- adjudication status
+- judge-sensitivity status
+- judge-disagreement status
 
-- `reports/health_reliability_eval_v1.md`
-- 필요시 `reports/demo_smoke_test_runs.md`는 그대로 두고, real run 전용 comparison report를 추가한다
-- 비교 figure가 필요하면 `scripts/render_run_figures.py`로 real run SVG를 생성한다
+## 6. Build Adjudication Artifacts When Needed
 
-예시:
+For release-critical anomalies:
 
 ```bash
-python3 scripts/render_run_figures.py \
+python scripts/build_adjudication_pack.py \
+  --run-dir runs/real_anthropic_sonnet46_v1_120_20260414
+```
+
+This creates:
+
+- `adjudication_packet.csv`
+- `rater_a_sheet.csv`
+- `rater_b_sheet.csv`
+- `final_adjudication_sheet.csv`
+
+To stage the sensitivity artifacts without making API calls:
+
+```bash
+python scripts/run_judge_sensitivity.py \
+  --run-dir runs/real_anthropic_sonnet46_v1_120_20260414 \
+  --prepare-only
+```
+
+That workflow writes:
+
+- `judge_sensitivity_sheet.csv`
+- `judge_sensitivity_summary.md`
+- `../judge_sensitivity.json`
+
+To turn the completed sensitivity pass into a human-review queue:
+
+```bash
+python scripts/build_judge_disagreement_brief.py \
+  --run-dir runs/real_anthropic_sonnet46_v1_120_20260414
+```
+
+That workflow writes:
+
+- `judge_disagreement_rows.csv`
+- `judge_disagreement_summary.json`
+- `judge_disagreement_brief.md`
+
+To package the current Sonnet materials for raters and the chair:
+
+```bash
+python scripts/build_expert_panel_handoff.py \
+  --run-dir runs/real_anthropic_sonnet46_v1_120_20260414
+```
+
+That workflow writes:
+
+- `panel_handoff/README.md`
+- `panel_handoff/rater_a/`
+- `panel_handoff/rater_b/`
+- `panel_handoff/chair/`
+- `panel_handoff/panel_handoff_manifest.json`
+
+For the current Sonnet packet, the chair-facing session outline is tracked at:
+
+- `runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/expert_panel_agenda.md`
+
+After raters complete their sheets, build the chair queue:
+
+```bash
+python scripts/build_reconciliation_brief.py \
+  --packet runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/adjudication_packet.csv \
+  --rater-a runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/rater_a_sheet.csv \
+  --rater-b runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/rater_b_sheet.csv \
+  --output-csv runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/chair_reconciliation_queue.csv \
+  --summary-json runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/chair_reconciliation_summary.json \
+  --summary-md runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/chair_reconciliation_brief.md
+```
+
+After raters complete their sheets:
+
+```bash
+python scripts/merge_adjudication.py \
+  --packet runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/adjudication_packet.csv \
+  --rater-a runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/rater_a_sheet.csv \
+  --rater-b runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/rater_b_sheet.csv \
+  --final-adjudication runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/final_adjudication_sheet.csv \
+  --output-csv runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/adjudication_merged.csv \
+  --summary-json runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/agreement_summary.json \
+  --summary-md runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/agreement_summary.md
+```
+
+## 7. Render Release Figures
+
+Canonical baseline:
+
+```bash
+python scripts/render_run_figures.py \
   --runs-root runs \
-  --run-name real_run_template_20260410 \
-  --run-name real_openai_gpt5nano_20260410 \
+  --run-name real_openai_gpt5mini_v1_120_20260413 \
   --figures-dir figures \
-  --output-prefix real_run \
-  --title-prefix "Real Run"
+  --output-prefix full_v1_canonical \
+  --title-prefix "Full-v1 Canonical" \
+  --require-png
 ```
 
-## 7. same-set sanity-check queue
-
-같은 benchmark set에서 두 run을 직접 비교할 때는 metric table만 보지 말고 review queue도 같이 만든다.
+Cross-provider comparison:
 
 ```bash
-python3 scripts/find_annotation_review_targets.py \
-  --left-annotations runs/<left_run>/annotation_sheet.csv \
-  --right-annotations runs/<right_run>/annotation_sheet.csv \
-  --left-label <left_model_label> \
-  --right-label <right_model_label> \
-  --max-targets 8 \
-  --output-md reports/<comparison_name>_sanity_check.md \
-  --output-csv reports/<comparison_name>_sanity_check.csv
+python scripts/render_run_figures.py \
+  --runs-root runs \
+  --run-name real_openai_gpt5mini_v1_120_20260413 \
+  --run-name real_deepseek_chat_v1_120_20260413 \
+  --run-name real_anthropic_haiku45_v1_120_20260413 \
+  --run-name real_anthropic_sonnet46_v1_120_20260414 \
+  --figures-dir figures \
+  --output-prefix full_v1_cross_provider \
+  --title-prefix "Full-v1 Cross-Provider" \
+  --require-png
 ```
 
-우선 manual pass는 아래에 집중한다.
+## 8. Release Check
 
-- `grade inflation` 또는 `unsupported directive`가 붙은 row
-- `I` row의 large divergence
-- `C` row의 preference omission disagreement
-- evaluator note에 `truncated`가 반복 등장하는 ambiguous omission case
+```bash
+python scripts/check_release_readiness.py --consistency-only
+```
 
-## 주의
+This validates:
 
-- demo run과 real run을 섞지 않는다.
-- real result를 발표할 때는 `manifest.json`의 model/provider 정보를 반드시 채운다.
-- `C`와 `I` failure를 qualitative case로 꼭 같이 제시한다.
-- full v1 canonical run을 시작하기 전에는 `reports/full_v1_dataset_build_20260413.md`와 `data/source_topic_pool_v1.csv`를 먼저 확인하는 편이 좋다.
+- required canonical reports
+- required SVG + PNG figures
+- adjudication packet artifacts
+- reviewer disagreement artifacts when judge sensitivity is complete
+- run manifest completeness
+- annotation CSV integrity
+- absence of stale release-state text
+
+Run the same command without `--consistency-only` only when you want strict release gating and the Sonnet adjudication loop is actually complete.
+
+## Notes
+
+- Do not treat the `40`-row same-set package as the canonical release benchmark. It is a supporting stress test.
+- Do not present the Sonnet `A/D/I preference omission` pattern as settled until blinded adjudication is complete.
+- Do not mix demo runs into external result narratives.

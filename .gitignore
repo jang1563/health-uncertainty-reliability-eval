@@ -46,3 +46,7 @@ secrets*.json
 HANDOFF_*.md
 **/HANDOFF_*.md
 08_Health_AI_Flagship_Artifact_Initiation.md
+
+# Nested project repositories, tracked separately
+01_evidence_to_recommendation_reliability_eval/
+02_drug_safety_update_sensitivity_eval/

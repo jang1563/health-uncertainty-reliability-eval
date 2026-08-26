@@ -1,173 +1,243 @@
 # Evidence-to-Recommendation Reliability Eval
 
-- checked_on: `2026-04-13`
+- checked_on: `2026-04-18`
 - working_title: `Evidence-to-Recommendation Reliability Eval`
 - parent_artifact_family: `Health Uncertainty and Reliability Eval`
-- status: `full-v1 canonical run complete on gpt-5-mini (120/120); 3-way cross-provider comparison complete (gpt-5-mini + deepseek-chat + claude-haiku-4-5, all 120/120 under same gpt-5-mini judge); seven real runs complete; expanded same-set freeze review recorded`
+- status: `full-v1 canonical run complete on gpt-5-mini (120/120); four-model cross-provider comparison complete on the same 120 rows; Sonnet 4.6 anomaly adjudication packet built (53 rows, merge status incomplete); completed Haiku sensitivity re-judge now shows strong judge dependence on the anomaly slice; release-readiness tooling, PNG figures, and broader tests are included`
 
 ## Purpose
 
-This package is the research pack for a public benchmark artifact that evaluates how faithfully models preserve **preventive-care recommendation grade**, **uncertainty language**, and **patient-preference sensitivity** in patient-facing answers.
+This repository is a benchmark artifact for a narrow but important patient-facing reliability question:
 
-The central question is **not** "does the model match the guideline?" The more important questions are:
+- does a model preserve preventive-care recommendation direction (`A/B/C/D/I`)?
+- does it preserve uncertainty language honestly?
+- does it preserve preference-sensitive framing where the source requires it?
 
-- Does the model exaggerate or weaken the strength of `A/B/C/D/I` recommendations?
-- On `I statement` topics, does the model honestly convey that evidence is insufficient?
-- On `C grade` topics — where patient values and tradeoffs are decisive — does the model invite or acknowledge patient preference?
-- Even when using patient-friendly language, does the model avoid distorting the underlying evidence strength?
+This is **not** a general medical QA benchmark, a recommendation-generation system, or a deployment-ready clinical product. It is a curated stress test for **recommendation-posture fidelity**.
 
-## Why this track
+## Canonical Artifacts
 
-Most public health benchmarks focus on one of two things:
+Use these in this order:
 
-- broad health-conversation safety
-- clinician-facing guideline adherence
+1. `reports/health_reliability_eval_v1.md`
+   - canonical public-facing report for the frozen `120`-row full-v1 benchmark
+2. `reports/cross_provider_comparison_v1_120_20260413.md`
+   - detailed four-model decomposition and paired-delta interpretation for the same `120` rows
+3. `reports/expanded_same_set_public_draft_20260413.md`
+   - supporting stress test on the frozen `40`-row same-set slice
+4. `reports/expanded_same_set_manuscript_draft_20260413.md`
+   - manuscript-style supporting narrative for the same supporting stress test package
 
-This project targets the gap between those:
+The `40`-row package is a **supporting stress test**, not the primary benchmark release. The canonical release substrate is `data/examples_v1_120.csv`.
 
-- `recommendation-grade fidelity`
-- `uncertainty disclosure fidelity`
-- `preference-sensitive communication`
+## Provenance And Positioning
 
-That is, this is **not** a `recommendation generation system` and **not** a `clinical workflow agent`. It measures how honestly a model transmits public evidence in a patient-facing answer.
+The benchmark is derived from `USPSTF` recommendation statements, with `AHRQ` used primarily for rubric and shared-decision framing support. Rows are paraphrase-first and designed to preserve:
 
-## Directory layout
+- recommendation strength
+- uncertainty disclosure
+- preference-sensitive communication
 
-- `data/README.md`
-- `data/source_topic_pool.csv`
-- `data/source_topic_pool_v1.csv`
+The intended novelty claim is narrow and auditable:
+
+> To our review as of April 2026, we did not find a public benchmark centered on preserving preventive-care recommendation strength, uncertainty, and preference sensitivity in patient-facing model responses.
+
+Closest adjacent work is summarized in `research/06_novelty_gap_and_positioning.md`. The important distinction is that this project targets **patient-facing transmission of evidence posture**, not clinician-facing guideline adherence or recommendation generation.
+
+## Current Benchmark State
+
+### Frozen benchmark substrates
+
 - `data/examples.csv`
+  - original `20`-row pilot
 - `data/examples_v1_40.csv`
+  - frozen same-set supporting stress test
 - `data/examples_v1_120.csv`
-- `data/rubric_schema.json`
-- `data/model_outputs_template.csv`
-- `data/model_outputs_template_v1_40.csv`
-- `data/model_outputs_template_v1_120.csv`
-- `data/annotations_template.csv`
-- `data/annotations_template_v1_40.csv`
-- `data/annotations_template_v1_120.csv`
-- `data/pilot_prompt_pack.jsonl`
-- `data/examples_v1_40_prompt_pack.jsonl`
-- `data/examples_v1_120_prompt_pack.jsonl`
-- `docs/methodology.md`
-- `docs/limitations.md`
-- `docs/annotation_guide.md`
-- `docs/real_run_playbook.md`
-- `prompts/judge_prompt.md`
-- `prompts/minimal_patient_facing_system_prompt.md`
-- `runs/README.md`
-- `runs/run_manifest_template.json`
-- `scripts/README.md`
-- `scripts/build_annotation_sheet.py`
-- `scripts/compare_runs.py`
-- `scripts/build_full_v1_dataset.py`
-- `scripts/export_prompt_pack.py`
-- `scripts/find_annotation_review_targets.py`
-- `scripts/extract_case_examples.py`
-- `scripts/finalize_run_dir.py`
-- `scripts/init_run_dir.py`
-- `scripts/judge_annotations_openai.py`
-- `scripts/prepare_run_dir.py`
-- `scripts/run_openai_responses.py`
-- `scripts/render_demo_figures.py`
-- `scripts/render_run_figures.py`
-- `scripts/seed_demo_runs.py`
-- `scripts/summarize_annotations.py`
-- `scripts/validate_examples_dataset.py`
-- `reports/health_reliability_eval_v1.md`
-- `reports/expanded_same_set_public_draft_20260413.md`
-- `reports/expanded_same_set_external_brief_20260413.md`
-- `reports/expanded_same_set_results_section_20260413.md`
-- `reports/expanded_same_set_manuscript_draft_20260413.md`
-- `reports/expanded_same_set_figure_legends_20260413.md`
-- `reports/demo_qualitative_cases.md`
-- `reports/demo_smoke_test_runs.md`
-- `reports/real_run_comparison_20260412.md`
-- `reports/real_run_comparison_20260412.csv`
-- `reports/real_run_comparison_v1_40_20260412.md`
-- `reports/real_run_comparison_v1_40_20260412.csv`
-- `reports/annotation_sanity_check_v1_40_20260412.md`
-- `reports/annotation_sanity_check_v1_40_20260412.csv`
-- `reports/annotation_second_pass_notes_v1_40_20260412.md`
-- `reports/annotation_freeze_notes_v1_40_20260413.md`
-- `reports/full_v1_dataset_build_20260413.md`
-- `reports/full_v1_run_status_20260413.md`
-- `figures/README.md`
-- `research/00_scope_and_research_questions.md`
-- `research/01_github_landscape.md`
-- `research/02_huggingface_landscape.md`
-- `research/03_arxiv_and_preprints.md`
-- `research/04_peer_reviewed_and_conference_literature.md`
-- `research/05_public_data_sources_and_usage_rights.md`
-- `research/06_novelty_gap_and_positioning.md`
-- `research/07_v1_dataset_and_rubric_spec.md`
-- `research/08_execution_plan.md`
+  - canonical full-v1 benchmark release substrate
 
-## Source policy (summary)
+### Completed real runs
 
-- `USPSTF`: paraphrase-first, short-quote-only when necessary, source URL required.
-- `AHRQ`: used primarily for rubric derivation; verbatim redistribution minimized.
-- `MedlinePlus`: only the explicitly public-domain health-topic summaries and medical-test information are used.
+- `runs/real_openai_gpt5mini_v1_120_20260413`
+  - canonical baseline, `120/120` scored
+- `runs/real_deepseek_chat_v1_120_20260413`
+  - cross-provider extension, `120/120` scored
+- `runs/real_anthropic_haiku45_v1_120_20260413`
+  - cross-provider extension, `120/120` scored
+- `runs/real_anthropic_sonnet46_v1_120_20260414`
+  - cross-provider extension, `119/120` scored
+- `runs/real_openai_gpt5mini_v1_40_20260412`
+  - supporting same-set stress test
+- `runs/real_openai_gpt5nano_v1_40_20260412`
+  - supporting same-set stress test
 
-## Current conclusion
+### Current headline metrics
 
-- The track is worth pursuing.
-- The closest adjacent works are `HealthBench`, `AMEGA`, `MedGUIDE`, *From Evidence to Recommendations...*, and `Q2CRBench-3`.
-- Those, however, sit closer to `broad conversation`, `guideline adherence`, or `recommendation generation` respectively, and are distinct from this project's core target: a `grade-preserving patient-facing reliability eval`.
+Canonical `gpt-5-mini` on `120` rows:
 
-## Current implementation status
+- `overall_rubric_score`: `1.7633`
+- `95% CI`: `[1.7067, 1.8133]`
+- `grade_fidelity_accuracy`: `0.8917`
+- `C_grade_preference_omission_rate`: `0.5938`
+- `I_statement_overrecommendation_rate`: `0.0312`
+- `unsupported_directive_rate`: `0.0083`
 
-- Research pack is complete.
-- Pilot dataset scaffold is built.
-- A `20`-item pilot draft is written and covers all of the `A/B/C/D/I` grades.
-- A `40`-item expanded candidate set is added and ready for the next run.
-- A `120`-item full-v1 scaffold is built.
-- Annotation workflow scaffold is built.
-- Prompt-pack export workflow is built.
-- Smoke-test demo-run workflow is built.
-- Multi-run comparison reporting and demo SVG figure workflow are built.
-- Real-run comparison reporting and real-run SVG figure workflow are built.
-- Real-run initialization and qualitative-case extraction workflow are built.
-- Run-centric `prepare`/`finalize` workflow is built.
-- A run script for the OpenAI Responses API is included.
-- An OpenAI judge script is included.
-- `runs/demo_handcrafted_reference` and `runs/demo_overconfident_baseline` are already seeded.
-- `runs/real_run_template_20260410` and `runs/real_openai_gpt5nano_20260410` are already populated.
-- `runs/real_openai_gpt5nano_v1_40_20260412` has been generated and scored against the expanded 40-row candidate set.
-- `runs/real_openai_gpt5mini_v1_40_20260412` has also been generated and scored on the same-set.
-- `runs/real_run_v1_120_template_20260413` is initialized as the full-v1 canonical run template.
-- `runs/real_openai_gpt5mini_v1_120_20260413` has `120/120` generation complete and `120/120` judged rows scored (canonical full-v1 baseline).
-- `runs/real_deepseek_chat_v1_120_20260413` has `120/120` generation and `120/120` judged rows scored on `deepseek-chat` with the same `gpt-5-mini` judge.
-- `runs/real_anthropic_haiku45_v1_120_20260413` has `120/120` generation and `120/120` judged rows scored on `claude-haiku-4-5-20251001` with the same `gpt-5-mini` judge (three-provider cross-provider comparison).
-- The `response -> annotation sheet -> summary report` pipeline has scripts and templates included, including `scripts/run_chat_completions.py` for any OpenAI-compatible provider. Anthropic's OpenAI-compatible endpoint is used directly; no provider-specific code path is needed.
-- Seven real model runs are complete, including the full-v1 canonical and a three-provider cross-provider comparison.
-- The `gpt-5-mini` vs `gpt-5-nano` same-set head-to-head on the expanded candidate set is complete.
-- An annotation sanity-check queue has been produced for the expanded same-set results.
-- The residual 3-row sanity-check queue is finished through final reread; the current official annotation sheet is treated as the working frozen version.
-- The full-v1 dataset build summary is in `reports/full_v1_dataset_build_20260413.md`.
-- The current full-v1 run state, provisional metrics, and missing retry list are in `reports/full_v1_run_status_20260413.md`.
-- A publication-style draft of the frozen 40-row same-set results is in `reports/expanded_same_set_public_draft_20260413.md`.
-- Shorter external brief and manuscript-style results-section drafts are in `reports/expanded_same_set_external_brief_20260413.md` and `reports/expanded_same_set_results_section_20260413.md`.
-- A manuscript-style full draft (intro → methods → results → discussion → limits) is in `reports/expanded_same_set_manuscript_draft_20260413.md`.
-- The manuscript draft now contains `Table 1`, `Table 2`, `Figure 1`, `Figure 2`, and `Box 1` callouts; copy-ready captions are in `reports/expanded_same_set_figure_legends_20260413.md`.
-- PNG figures are not yet generated; demo SVG and real-run SVG figures are available.
-- Two pipeline-validation demo runs can be seeded at any time.
-- A run-directory template is ready for immediate real-run use.
-- Once `outputs.csv` is populated, annotation and summary artifacts can be produced from the run directory.
-- `annotation_sheet.csv` can be auto-scored by the OpenAI `mini` judge.
-- If `OPENAI_API_KEY` is set, `outputs.csv` can be filled directly inside the run directory.
+### Sonnet adjudication status
 
-## Immediate next steps
+`claude-sonnet-4-6` remains the most methodologically sensitive result in the repo:
 
-1. Add `claude-sonnet-4` on the same 120 items to test whether Haiku's I-statement gap vs `gpt-5-mini` and its A-grade over-hedging are scale-sensitive within Anthropic's lineage.
-2. Add an open Llama-family model (`Llama-3.3-70B-Instruct` via Together or Groq) to test whether a model without vendor-specific health safety post-training lands near the Haiku end (`47%`) or the GPT/DeepSeek end (`59%`) of C-grade preference omission.
-3. Consider Gemini 2.5 Flash for a fourth independent training pipeline.
-4. Generate publication-ready PNG figures for the full-v1 canonical and three-way cross-provider comparison.
-5. Keep the expanded `40`-row same-set results as the manuscript package and stress-test reference.
+- `C_grade_preference_omission_rate`: `0.0938`
+- `95% CI`: `[0.0, 0.2188]`
+- automated `A/D/I preference omission` counts remain **provisional**
+- a blinded adjudication packet is built at `runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/`
+- current packet size: `53` rows
+- current merge status: `incomplete`
+- a dedicated sensitivity-judge workflow is available through `scripts/run_judge_sensitivity.py`
+- current sensitivity status: `complete`
+- secondary `claude-haiku-4-5-20251001` re-judge exact agreement on `preference_sensitivity`: `0.0755`
+- failure-label exact-match rate on the `53`-row packet: `0.0`
+- the secondary judge left failure labels blank on `47/53` rows and labeled `preference omission` on only `4/53`
+- the disagreement review queue is now staged at `runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/judge_disagreement_brief.md`
+- the panel handoff agenda is staged at `runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/expert_panel_agenda.md`
+- the packaged role-based handoff lives under `runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/panel_handoff/` when built
+- the reviewer queue currently flags `24` rows as `critical` and `29` as `high`
+- the dominant failure transition is `preference omission -> <blank>` on `46/53` rows
+
+Taken together, the completed sensitivity pass materially weakens any claim that the automated Sonnet A/D/I anomaly is already a settled model behavior. Human adjudication is now the deciding step.
+
+## Release Workflow
+
+The release-ready path is:
+
+1. initialize a run directory with `scripts/init_run_dir.py`
+2. generate model responses into `outputs.csv`
+3. build `annotation_sheet.csv` with `scripts/prepare_run_dir.py`
+4. score with `scripts/judge_annotations_openai.py`
+   - full response text is the default judge path
+   - fallback truncation is explicit and recorded in `judge_metadata.json`
+5. finalize the run with `scripts/finalize_run_dir.py`
+6. if a release-critical anomaly exists, build an adjudication packet with `scripts/build_adjudication_pack.py`
+7. run a tracked sensitivity pass with `scripts/run_judge_sensitivity.py`
+8. build a reviewer brief with `scripts/build_judge_disagreement_brief.py`
+9. package role-specific expert-panel folders with `scripts/build_expert_panel_handoff.py`
+10. after raters return, build a chair reconciliation brief with `scripts/build_reconciliation_brief.py`
+11. merge blinded human review with `scripts/merge_adjudication.py`
+12. render SVG and PNG figures with `scripts/render_run_figures.py`
+13. validate the repo state with `scripts/check_release_readiness.py --consistency-only`
+
+Example commands:
+
+```bash
+python scripts/build_adjudication_pack.py \
+  --run-dir runs/real_anthropic_sonnet46_v1_120_20260414
+```
+
+```bash
+python scripts/run_judge_sensitivity.py \
+  --run-dir runs/real_anthropic_sonnet46_v1_120_20260414 \
+  --prepare-only
+```
+
+```bash
+python scripts/run_judge_sensitivity.py \
+  --run-dir runs/real_anthropic_sonnet46_v1_120_20260414
+```
+
+```bash
+python scripts/build_judge_disagreement_brief.py \
+  --run-dir runs/real_anthropic_sonnet46_v1_120_20260414
+```
+
+```bash
+python scripts/build_expert_panel_handoff.py \
+  --run-dir runs/real_anthropic_sonnet46_v1_120_20260414
+```
+
+```bash
+python scripts/build_reconciliation_brief.py \
+  --packet runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/adjudication_packet.csv \
+  --rater-a runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/rater_a_sheet.csv \
+  --rater-b runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/rater_b_sheet.csv \
+  --output-csv runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/chair_reconciliation_queue.csv \
+  --summary-json runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/chair_reconciliation_summary.json \
+  --summary-md runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/chair_reconciliation_brief.md
+```
+
+```bash
+python scripts/merge_adjudication.py \
+  --packet runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/adjudication_packet.csv \
+  --rater-a runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/rater_a_sheet.csv \
+  --rater-b runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/rater_b_sheet.csv \
+  --final-adjudication runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/final_adjudication_sheet.csv \
+  --output-csv runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/adjudication_merged.csv \
+  --summary-json runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/agreement_summary.json \
+  --summary-md runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/agreement_summary.md
+```
+
+```bash
+python scripts/render_run_figures.py \
+  --runs-root runs \
+  --run-name real_openai_gpt5mini_v1_120_20260413 \
+  --run-name real_deepseek_chat_v1_120_20260413 \
+  --run-name real_anthropic_haiku45_v1_120_20260413 \
+  --run-name real_anthropic_sonnet46_v1_120_20260414 \
+  --figures-dir figures \
+  --output-prefix full_v1_cross_provider \
+  --title-prefix "Full-v1 Cross-Provider" \
+  --require-png
+```
+
+```bash
+python scripts/check_release_readiness.py --consistency-only
+```
+
+Use `python scripts/check_release_readiness.py` without `--consistency-only` only when the Sonnet human-review loop is actually complete and you want a strict release gate.
+
+See `docs/red_team_review_20260417.md` for the tracked adversarial workflow review and the follow-up hardening actions.
+
+## Directory Highlights
+
+- `data/`
+  - frozen benchmark substrates and blank templates
+- `runs/`
+  - real run directories, summaries, adjudication artifacts
+- `reports/`
+  - canonical report plus supporting stress-test drafts
+- `figures/`
+  - SVG source-of-truth figures plus release PNG companions
+- `scripts/`
+  - standard-library workflow scripts for build, scoring, adjudication, figures, and release checks
+- `tests/`
+  - workflow, adjudication, judge, dataset, and release-readiness coverage
+
+## Current Implementation Status
+
+- research landscape and rights memo complete
+- frozen `120`-row canonical dataset complete
+- frozen `40`-row supporting stress test complete
+- four-model cross-provider full-v1 comparison complete
+- bootstrap confidence intervals now emitted in run summaries
+- paired bootstrap deltas now emitted in run-comparison outputs
+- Sonnet adjudication packet, blinded rater sheets, final template, and merge summary scaffold are tracked
+- Sonnet sensitivity-sheet preparation and summary workflow are tracked through `scripts/run_judge_sensitivity.py`
+- full-response-first judge metadata is supported
+- release PNG figures for canonical and cross-provider comparisons are tracked
+- the packaged `panel_handoff/` artifact is tracked and now checked for freshness against its source adjudication files
+- release-readiness validation script is included
+- a tracked adversarial review note now documents resolved workflow hardening findings and the remaining human-review blockers
+- unit tests now cover adjudication tooling, judge fallback behavior, dataset build regression, review-target selection, and release-check negative paths
+
+## Immediate Next Steps
+
+1. Complete the blinded `rater_a_sheet.csv`, `rater_b_sheet.csv`, and `final_adjudication_sheet.csv` files for the `53`-row Sonnet packet.
+2. Distribute the existing `adjudication/panel_handoff/rater_a/` and `adjudication/panel_handoff/rater_b/` folders separately, and hold back `adjudication/panel_handoff/chair/` until both independent sheets are returned.
+3. After the blinded sheets return, rebuild `adjudication/chair_reconciliation_brief.md` to focus the chair-led discussion.
+4. Use `adjudication/judge_disagreement_brief.md` and `adjudication/judge_disagreement_rows.csv` to focus the blinded adjudication discussion on `preference_sensitivity` and failure-label semantics.
+5. If the blinded merge confirms systematic misuse of `preference omission` on `A/D/I`, revise the rubric and label taxonomy before broad external claims.
+6. Only after the adjudicated release candidate is stable should the project add new model lineages such as Llama or Gemini.
 
 ## License
 
-This package is covered by the repository's top-level split license:
+This project uses a split license by asset type:
 
-- **Code** (`scripts/`, all `.py` files) — [Apache License 2.0](../LICENSE).
-- **Data, prompts, rubrics, figures, reports** (`data/`, `prompts/`, `docs/`, `figures/`, `reports/`, `research/`, `runs/`, all `.md`/`.csv`/`.jsonl`/`.json`/`.svg`) — [Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)](../LICENSE-DATA). Commercial use of the dataset or prompts requires a separate license — see the repository root README for contact.
+- **Code** (`scripts/`, all `.py` files) — [Apache License 2.0](LICENSE)
+- **Data, prompts, rubrics, figures, reports** (`data/`, `prompts/`, `docs/`, `figures/`, `reports/`, `research/`, `runs/`, `.md`/`.csv`/`.jsonl`/`.json`/`.svg`/`.png`) — [CC BY-NC 4.0](LICENSE-DATA)

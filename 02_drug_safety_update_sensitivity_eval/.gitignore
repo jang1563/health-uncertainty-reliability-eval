@@ -18,6 +18,9 @@ ENV/
 # Matplotlib cache
 .matplotlib/
 
+# Pytest cache
+.pytest_cache/
+
 # IDE / editor
 .vscode/
 .idea/
@@ -41,6 +44,11 @@ Thumbs.db
 # Intermediate eval runs (not for public repo)
 eval/output/*_smoke/
 eval/output/*_verify/
+
+# Private manuscript and paper assets (kept locally, not published)
+docs/paper_draft.md
+figures/figures_for_paper/
+scripts/make_paper_figures.py
 
 # Backup files
 *.bak

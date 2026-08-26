@@ -2,7 +2,12 @@
 
 import argparse
 import json
+import shutil
+import subprocess
+import tempfile
 from pathlib import Path
+
+from e2r_png import Canvas, rgb
 
 
 PALETTE = [
@@ -39,6 +44,16 @@ def parse_args():
         "--subtitle",
         default="Higher is better for overall and grade fidelity. Lower is better for omission and overrecommendation metrics.",
         help="Subtitle shown under the figure title.",
+    )
+    parser.add_argument(
+        "--skip-png",
+        action="store_true",
+        help="Write SVG only and skip PNG export.",
+    )
+    parser.add_argument(
+        "--require-png",
+        action="store_true",
+        help="Fail if PNG export cannot be completed.",
     )
     return parser.parse_args()
 
@@ -248,6 +263,191 @@ def render_failure_comparison(runs, output_path, title_prefix):
     output_path.write_text("\n".join(parts) + "\n", encoding="utf-8")
 
 
+def shorten_label(text, max_length=26):
+    if len(text) <= max_length:
+        return text
+    return text[: max_length - 3] + "..."
+
+
+def draw_centered_text(canvas, center_x, y, text, color, scale=1):
+    width = canvas.text_width(text, scale=scale)
+    canvas.draw_text(int(center_x - width / 2), y, text, color, scale=scale)
+
+
+def render_metric_comparison_png(runs, output_path, title_prefix, subtitle):
+    specs = metric_specs()
+    colors = build_colors(runs)
+    width = 1400
+    height = 620
+    left = 90
+    right = 50
+    top = 120
+    bottom = 120
+    chart_h = height - top - bottom
+    chart_w = width - left - right
+    group_w = chart_w / len(specs)
+    bar_w = min(54, (group_w - 40) / max(len(runs), 1))
+    gap = 12
+
+    canvas = Canvas(width, height, rgb("#fffaf3"))
+    canvas.fill_rect(20, 18, 1360, 584, rgb("#fffdf8"))
+    canvas.draw_text(44, 38, f"{title_prefix} Metric Comparison", rgb("#1f2937"), scale=2)
+    canvas.draw_text(44, 76, shorten_label(subtitle, 80), rgb("#6b7280"), scale=1)
+    canvas.draw_vline(left, top, height - bottom, rgb("#9ca3af"))
+    canvas.draw_hline(left, width - right, height - bottom, rgb("#9ca3af"))
+
+    for index, (metric_key, metric_label, metric_max, direction) in enumerate(specs):
+        group_center = left + group_w * index + group_w / 2
+        total_group_width = len(runs) * bar_w + max(len(runs) - 1, 0) * gap
+        start_x = group_center - total_group_width / 2
+        marker = "HIGHER BETTER" if direction == "up" else "LOWER BETTER"
+        draw_centered_text(canvas, group_center, top - 36, f"MAX {metric_max:.1f}", rgb("#6b7280"), scale=1)
+        draw_centered_text(canvas, group_center, top - 20, marker, rgb("#6b7280"), scale=1)
+        draw_centered_text(canvas, group_center, height - bottom + 24, metric_label, rgb("#374151"), scale=1)
+        canvas.draw_hline(int(left + group_w * index + 10), int(left + group_w * (index + 1) - 10), top, rgb("#ece7df"))
+        for run_index, run in enumerate(runs):
+            raw_value = run["summary"].get(metric_key)
+            value = 0.0 if raw_value is None else float(raw_value)
+            bar_h = (value / metric_max) * chart_h if metric_max else 0
+            x = int(start_x + run_index * (bar_w + gap))
+            y = int(top + chart_h - bar_h)
+            canvas.fill_rect(x, y, int(bar_w), int(bar_h), rgb(colors[run["run_name"]]))
+            draw_centered_text(canvas, x + bar_w / 2, max(12, y - 16), f"{value:.2f}", rgb("#6b7280"), scale=1)
+
+    legend_y = height - 56
+    legend_x = left
+    legend_step = 320
+    for index, run in enumerate(runs):
+        x = legend_x + index * legend_step
+        canvas.fill_rect(x, legend_y - 10, 16, 16, rgb(colors[run["run_name"]]))
+        canvas.draw_text(x + 24, legend_y - 8, shorten_label(f"{run['label']} ({run['run_name']})", 42), rgb("#374151"), scale=1)
+
+    canvas.save(output_path)
+
+
+def render_failure_comparison_png(runs, output_path, title_prefix):
+    colors = build_colors(runs)
+    failures = sorted(
+        {
+            failure
+            for run in runs
+            for failure in run["summary"].get("failure_count_overall", {}).keys()
+        }
+    )
+    if not failures:
+        failures = ["none"]
+
+    width = 1400
+    height = 620
+    left = 90
+    right = 50
+    top = 120
+    bottom = 140
+    chart_h = height - top - bottom
+    chart_w = width - left - right
+    max_value = 1
+    for run in runs:
+        for failure in failures:
+            max_value = max(max_value, int(run["summary"].get("failure_count_overall", {}).get(failure, 0)))
+    group_w = chart_w / len(failures)
+    bar_w = min(54, (group_w - 40) / max(len(runs), 1))
+    gap = 12
+
+    canvas = Canvas(width, height, rgb("#fffaf3"))
+    canvas.fill_rect(20, 18, 1360, 584, rgb("#fffdf8"))
+    canvas.draw_text(44, 38, f"{title_prefix} Failure Comparison", rgb("#1f2937"), scale=2)
+    canvas.draw_text(44, 76, "Failure counts are raw row-level totals from each run summary.", rgb("#6b7280"), scale=1)
+    canvas.draw_vline(left, top, height - bottom, rgb("#9ca3af"))
+    canvas.draw_hline(left, width - right, height - bottom, rgb("#9ca3af"))
+
+    tick_count = max_value if max_value <= 6 else 6
+    for tick in range(tick_count + 1):
+        value = (max_value / tick_count) * tick if tick_count else 0
+        y = int(top + chart_h - (value / max_value * chart_h if max_value else 0))
+        canvas.draw_hline(left, width - right, y, rgb("#ece7df"))
+        canvas.draw_text(left - 32, y - 4, str(int(round(value))), rgb("#6b7280"), scale=1)
+
+    for index, failure in enumerate(failures):
+        group_center = left + group_w * index + group_w / 2
+        total_group_width = len(runs) * bar_w + max(len(runs) - 1, 0) * gap
+        start_x = group_center - total_group_width / 2
+        draw_centered_text(canvas, group_center, height - bottom + 24, shorten_label(failure, 16), rgb("#374151"), scale=1)
+        for run_index, run in enumerate(runs):
+            value = int(run["summary"].get("failure_count_overall", {}).get(failure, 0))
+            bar_h = (value / max_value * chart_h) if max_value else 0
+            x = int(start_x + run_index * (bar_w + gap))
+            y = int(top + chart_h - bar_h)
+            canvas.fill_rect(x, y, int(bar_w), int(bar_h), rgb(colors[run["run_name"]]))
+            draw_centered_text(canvas, x + bar_w / 2, max(12, y - 16), str(value), rgb("#6b7280"), scale=1)
+
+    legend_y = height - 72
+    legend_x = left
+    legend_step = 320
+    for index, run in enumerate(runs):
+        x = legend_x + index * legend_step
+        canvas.fill_rect(x, legend_y - 10, 16, 16, rgb(colors[run["run_name"]]))
+        canvas.draw_text(x + 24, legend_y - 8, shorten_label(f"{run['label']} ({run['run_name']})", 42), rgb("#374151"), scale=1)
+
+    canvas.save(output_path)
+
+
+def export_png(svg_path, png_path, require_png=False, fallback_renderer=None):
+    cairosvg = shutil.which("cairosvg")
+    if cairosvg:
+        try:
+            subprocess.run(
+                [cairosvg, str(svg_path), "-o", str(png_path)],
+                check=True,
+            )
+            return True
+        except subprocess.CalledProcessError:
+            pass
+
+    sips = shutil.which("sips")
+    if sips:
+        try:
+            subprocess.run(
+                [sips, "-s", "format", "png", str(svg_path), "--out", str(png_path)],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            return True
+        except subprocess.CalledProcessError:
+            pass
+
+    qlmanage = shutil.which("qlmanage")
+    if qlmanage:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            try:
+                subprocess.run(
+                    [qlmanage, "-t", "-s", "2000", "-o", tmpdir, str(svg_path)],
+                    check=True,
+                    capture_output=True,
+                    text=True,
+                )
+            except subprocess.CalledProcessError:
+                pass
+            else:
+                generated = Path(tmpdir) / f"{svg_path.stem}.png"
+                if generated.exists():
+                    png_path.write_bytes(generated.read_bytes())
+                    return True
+
+    if require_png:
+        if fallback_renderer is not None:
+            fallback_renderer(png_path)
+            return True
+        raise SystemExit(
+            "PNG export requested but no SVG->PNG converter was available. "
+            "Install cairosvg or run on a system with sips/qlmanage."
+        )
+    if fallback_renderer is not None:
+        fallback_renderer(png_path)
+        return True
+    return False
+
+
 def main():
     args = parse_args()
     runs = load_runs(args.runs_root, args.run_name)
@@ -256,12 +456,40 @@ def main():
 
     metric_path = figures_dir / f"{args.output_prefix}_metric_comparison.svg"
     failure_path = figures_dir / f"{args.output_prefix}_failure_count_comparison.svg"
+    metric_png_path = figures_dir / f"{args.output_prefix}_metric_comparison.png"
+    failure_png_path = figures_dir / f"{args.output_prefix}_failure_count_comparison.png"
 
     render_metric_comparison(runs, metric_path, args.title_prefix, args.subtitle)
     render_failure_comparison(runs, failure_path, args.title_prefix)
 
     print(f"Wrote {metric_path}")
     print(f"Wrote {failure_path}")
+    if not args.skip_png:
+        metric_exported = export_png(
+            metric_path,
+            metric_png_path,
+            require_png=args.require_png,
+            fallback_renderer=lambda output_path: render_metric_comparison_png(
+                runs,
+                output_path,
+                args.title_prefix,
+                args.subtitle,
+            ),
+        )
+        failure_exported = export_png(
+            failure_path,
+            failure_png_path,
+            require_png=args.require_png,
+            fallback_renderer=lambda output_path: render_failure_comparison_png(
+                runs,
+                output_path,
+                args.title_prefix,
+            ),
+        )
+        if metric_exported:
+            print(f"Wrote {metric_png_path}")
+        if failure_exported:
+            print(f"Wrote {failure_png_path}")
 
 
 if __name__ == "__main__":

@@ -46,6 +46,7 @@ The benchmark runs used `claude-haiku-4-5-20251001` as the consistent primary ju
 ## Artifact Index
 
 - Cross-model comparison: [cross_model_comparison.md](reports/cross_model_comparison.md)
+- Manuscript-style results draft: [manuscript_style_results_draft.md](reports/manuscript_style_results_draft.md)
 - Haiku report: [haiku_v2.md](reports/haiku_v2.md)
 - GPT-4o-mini report: [gpt4o_mini.md](reports/gpt4o_mini.md)
 - GPT-5-nano report: [gpt5_nano.md](reports/gpt5_nano.md)

@@ -7,6 +7,38 @@
   "C_grade_preference_omission_rate": 0.0938,
   "I_statement_overrecommendation_rate": 0.125,
   "unsupported_directive_rate": 0.0756,
+  "confidence_intervals": {
+    "overall_rubric_score": {
+      "lower": 1.5613,
+      "upper": 1.6924,
+      "samples": 10000,
+      "method": "row_bootstrap"
+    },
+    "grade_fidelity_accuracy": {
+      "lower": 0.7983,
+      "upper": 0.9244,
+      "samples": 10000,
+      "method": "row_bootstrap"
+    },
+    "C_grade_preference_omission_rate": {
+      "lower": 0.0,
+      "upper": 0.2188,
+      "samples": 10000,
+      "method": "row_bootstrap"
+    },
+    "I_statement_overrecommendation_rate": {
+      "lower": 0.0312,
+      "upper": 0.25,
+      "samples": 10000,
+      "method": "row_bootstrap"
+    },
+    "unsupported_directive_rate": {
+      "lower": 0.0336,
+      "upper": 0.1261,
+      "samples": 10000,
+      "method": "row_bootstrap"
+    }
+  },
   "average_score_by_dimension": {
     "recommendation_fidelity": 1.7815,
     "evidence_strength_and_uncertainty_fidelity": 1.8319,
@@ -103,5 +135,214 @@
       "preference omission": 16,
       "unsupported directive": 1
     }
+  },
+  "provisional_flags": [
+    "incomplete_scoring",
+    "chair_reconciliation_pending"
+  ],
+  "adjudication_status": {
+    "status": "incomplete",
+    "packet_rows": 53,
+    "completed_rows": 0,
+    "finalized_rows": 0,
+    "exact_agreement_by_dimension": {
+      "recommendation_fidelity": null,
+      "evidence_strength_and_uncertainty_fidelity": null,
+      "preference_sensitivity": null,
+      "action_safety": null,
+      "communication_clarity": null
+    },
+    "mean_absolute_difference_by_dimension": {
+      "recommendation_fidelity": null,
+      "evidence_strength_and_uncertainty_fidelity": null,
+      "preference_sensitivity": null,
+      "action_safety": null,
+      "communication_clarity": null
+    },
+    "cohen_kappa_by_dimension": {
+      "recommendation_fidelity": null,
+      "evidence_strength_and_uncertainty_fidelity": null,
+      "preference_sensitivity": null,
+      "action_safety": null,
+      "communication_clarity": null
+    },
+    "failure_label_exact_match_rate": null,
+    "disposition_counts": {},
+    "path": "runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/agreement_summary.json"
+  },
+  "judge_sensitivity": {
+    "status": "complete",
+    "source_run": "real_anthropic_sonnet46_v1_120_20260414",
+    "packet_path": "/Users/jak4013/Dropbox/Bioinformatics/Claude/Healt_AI/01_evidence_to_recommendation_reliability_eval/runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/adjudication_packet.csv",
+    "sensitivity_sheet_path": "/Users/jak4013/Dropbox/Bioinformatics/Claude/Healt_AI/01_evidence_to_recommendation_reliability_eval/runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/judge_sensitivity_sheet.csv",
+    "metadata_path": "/Users/jak4013/Dropbox/Bioinformatics/Claude/Healt_AI/01_evidence_to_recommendation_reliability_eval/runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/judge_sensitivity_metadata.json",
+    "summary_md_path": "/Users/jak4013/Dropbox/Bioinformatics/Claude/Healt_AI/01_evidence_to_recommendation_reliability_eval/runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/judge_sensitivity_summary.md",
+    "default_model": "claude-haiku-4-5-20251001",
+    "default_api_base": "https://api.anthropic.com/v1",
+    "judge_model": "claude-haiku-4-5-20251001",
+    "judge_role": "sensitivity",
+    "api_base": "https://api.anthropic.com/v1",
+    "api_key_env": "ANTHROPIC_API_KEY",
+    "primary_mode": "full_response",
+    "fallback_max_response_chars": 500,
+    "fallback_truncated_rows": 0,
+    "status_counts": {
+      "scored": 53
+    },
+    "total_rows": 53,
+    "shared_rows": 53,
+    "scored_rows": 53,
+    "changed_rows": 53,
+    "changed_score_rows": 52,
+    "changed_failure_rows": 53,
+    "exact_agreement_by_dimension": {
+      "recommendation_fidelity": 0.8302,
+      "evidence_strength_and_uncertainty_fidelity": 0.9434,
+      "preference_sensitivity": 0.0755,
+      "action_safety": 0.9623,
+      "communication_clarity": 0.6792
+    },
+    "mean_absolute_difference_by_dimension": {
+      "recommendation_fidelity": 0.1887,
+      "evidence_strength_and_uncertainty_fidelity": 0.0566,
+      "preference_sensitivity": 1.3208,
+      "action_safety": 0.0566,
+      "communication_clarity": 0.3208
+    },
+    "cohen_kappa_by_dimension": {
+      "recommendation_fidelity": 0.2944,
+      "evidence_strength_and_uncertainty_fidelity": 0.7419,
+      "preference_sensitivity": -0.0277,
+      "action_safety": 0.733,
+      "communication_clarity": 0.0721
+    },
+    "failure_label_exact_match_rate": 0.0,
+    "path": "runs/real_anthropic_sonnet46_v1_120_20260414/judge_sensitivity.json"
+  },
+  "judge_disagreement": {
+    "status": "complete",
+    "source_run": "real_anthropic_sonnet46_v1_120_20260414",
+    "total_rows": 53,
+    "shared_rows": 53,
+    "scored_rows": 53,
+    "changed_rows": 53,
+    "changed_score_rows": 52,
+    "changed_failure_rows": 53,
+    "failure_label_exact_match_rate": 0.0,
+    "exact_agreement_by_dimension": {
+      "recommendation_fidelity": 0.8302,
+      "evidence_strength_and_uncertainty_fidelity": 0.9434,
+      "preference_sensitivity": 0.0755,
+      "action_safety": 0.9623,
+      "communication_clarity": 0.6792
+    },
+    "mean_absolute_difference_by_dimension": {
+      "recommendation_fidelity": 0.1887,
+      "evidence_strength_and_uncertainty_fidelity": 0.0566,
+      "preference_sensitivity": 1.3208,
+      "action_safety": 0.0566,
+      "communication_clarity": 0.3208
+    },
+    "cohen_kappa_by_dimension": {
+      "recommendation_fidelity": 0.2944,
+      "evidence_strength_and_uncertainty_fidelity": 0.7419,
+      "preference_sensitivity": -0.0277,
+      "action_safety": 0.733,
+      "communication_clarity": 0.0721
+    },
+    "priority_rows": 53,
+    "priority_bucket_counts": {
+      "critical": 24,
+      "high": 29
+    },
+    "dimension_changed_counts": {
+      "action_safety": 2,
+      "communication_clarity": 17,
+      "evidence_strength_and_uncertainty_fidelity": 3,
+      "preference_sensitivity": 49,
+      "recommendation_fidelity": 9
+    },
+    "changed_rows_by_grade": {
+      "A": 11,
+      "C": 3,
+      "D": 13,
+      "I": 26
+    },
+    "changed_rows_by_task_family": {
+      "direct_recommendation": 13,
+      "expert_explanation": 22,
+      "preference_sensitive": 2,
+      "uncertainty_elicitation": 16
+    },
+    "failure_transition_counts": {
+      "grade deflation; preference omission -> <blank>": 1,
+      "grade deflation; preference omission; unsupported directive -> grade inflation; preference omission": 1,
+      "missing uncertainty disclosure; preference omission -> missing uncertainty disclosure": 1,
+      "preference omission -> <blank>": 46,
+      "preference omission -> grade deflation; preference omission": 1,
+      "preference omission; unsupported directive -> grade deflation; preference omission": 1,
+      "preference omission; unsupported directive -> grade inflation; missing uncertainty disclosure": 1,
+      "preference omission; unsupported directive -> grade inflation; preference omission; unsupported directive": 1
+    },
+    "secondary_blank_failure_rows": 47,
+    "primary_zero_to_secondary_positive_preference_rows": 43,
+    "top_priority_adjudication_ids": [
+      "adj_043",
+      "adj_033",
+      "adj_013",
+      "adj_010",
+      "adj_051",
+      "adj_039",
+      "adj_019",
+      "adj_006",
+      "adj_053",
+      "adj_052"
+    ],
+    "packet_path": "/Users/jak4013/Dropbox/Bioinformatics/Claude/Healt_AI/01_evidence_to_recommendation_reliability_eval/runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/adjudication_packet.csv",
+    "sensitivity_sheet_path": "/Users/jak4013/Dropbox/Bioinformatics/Claude/Healt_AI/01_evidence_to_recommendation_reliability_eval/runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/judge_sensitivity_sheet.csv",
+    "output_csv_path": "/Users/jak4013/Dropbox/Bioinformatics/Claude/Healt_AI/01_evidence_to_recommendation_reliability_eval/runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/judge_disagreement_rows.csv",
+    "output_md_path": "/Users/jak4013/Dropbox/Bioinformatics/Claude/Healt_AI/01_evidence_to_recommendation_reliability_eval/runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/judge_disagreement_brief.md",
+    "path": "runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/judge_disagreement_summary.json"
+  },
+  "chair_reconciliation": {
+    "status": "not_ready",
+    "packet_rows": 53,
+    "completed_rows": 0,
+    "incomplete_rows": 53,
+    "agreement_rows": 0,
+    "disagreement_rows": 0,
+    "priority_bucket_counts": {
+      "blocked": 53
+    },
+    "disagreement_by_dimension": {},
+    "disagreement_by_grade": {},
+    "disagreement_by_task_family": {},
+    "failure_label_exact_match_rate": null,
+    "failure_transition_counts": {},
+    "top_priority_adjudication_ids": [
+      "adj_053",
+      "adj_052",
+      "adj_051",
+      "adj_050",
+      "adj_049",
+      "adj_048",
+      "adj_047",
+      "adj_046",
+      "adj_045",
+      "adj_044"
+    ],
+    "packet_path": "runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/adjudication_packet.csv",
+    "rater_a_path": "runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/rater_a_sheet.csv",
+    "rater_b_path": "runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/rater_b_sheet.csv",
+    "output_csv_path": "runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/chair_reconciliation_queue.csv",
+    "output_md_path": "runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/chair_reconciliation_brief.md",
+    "path": "runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/chair_reconciliation_summary.json"
+  },
+  "run_manifest": {
+    "run_name": "real_anthropic_sonnet46_v1_120_20260414",
+    "model_name": "claude-sonnet-4-6",
+    "provider": "Anthropic",
+    "examples_source": "data/examples_v1_120.csv",
+    "prompt_version": "minimal_patient_facing_system_prompt_v1"
   }
 }

@@ -1,63 +1,52 @@
 # Health Reliability Eval v1
 
-- checked_on: `2026-04-13`
+- checked_on: `2026-04-16`
 - project: `Evidence-to-Recommendation Reliability Eval`
-- report_status: `full-v1 canonical run complete on gpt-5-mini (120/120); 3-way cross-provider comparison complete (gpt-5-mini + deepseek-chat + claude-haiku-4-5, all 120/120 with the same gpt-5-mini judge); expanded 40-row same-set comparison retained as stress test`
+- report_status: `release candidate with canonical 120-row benchmark complete, four-model comparison complete, and Sonnet adjudication packet built but not yet completed`
 
-## Report intent
+## Report Intent
 
-This document is the working public-facing report for the Evidence-to-Recommendation Reliability Eval. It centers on the canonical **full-v1 run** (`gpt-5-mini` on `examples_v1_120.csv`, 120/120 rows judged) and retains the earlier pilot and expanded same-set runs as methodological context and stability stress tests.
+This is the canonical public report for the current repository state.
 
-## Benchmark question
+- primary benchmark substrate: `data/examples_v1_120.csv`
+- canonical baseline: `runs/real_openai_gpt5mini_v1_120_20260413`
+- cross-provider comparison: `gpt-5-mini`, `deepseek-chat`, `claude-haiku-4-5-20251001`, `claude-sonnet-4-6`
+- supporting stress test only: the frozen `40`-row same-set package in `reports/expanded_same_set_public_draft_20260413.md`
 
-Can a model answer preventive-care questions in a way that preserves:
+The benchmark evaluates **recommendation-posture fidelity** in patient-facing preventive-care answers. It is not a deployment claim and not a general medical QA benchmark.
 
-- recommendation direction (A / B / C / D / I)
-- evidence strength
+## Provenance And Scope
+
+Rows are derived from `USPSTF` recommendation statements, with `AHRQ` used for rubric and shared-decision framing support. The benchmark is designed to measure whether models preserve:
+
+- recommendation direction
+- recommendation strength
 - uncertainty disclosure
-- patient preference sensitivity
+- preference-sensitive framing
 
-The benchmark targets **recommendation-posture fidelity** — not general medical QA accuracy. It measures whether the model faithfully transmits the evidence posture it has been given, including honest uncertainty on `I statements` and preference-aware framing on `C grades`.
+The closest neighboring work is summarized in `research/06_novelty_gap_and_positioning.md`. The intended contribution here is narrower: a public stress test for **preventive-care recommendation strength, uncertainty, and preference sensitivity in patient-facing model responses**.
 
-## Current artifact status
-
-- Research landscape complete
-- Source-rights memo complete
-- Rubric schema drafted and frozen
-- Source topic pool drafted (v1)
-- Example sets: pilot (20), expanded (40), full-v1 (120)
-- Annotation workflow scaffolded
-- Demo smoke-test runs complete
-- Real model runs completed:
-  - `gpt-5-mini` (2026-04-10, 20-row pilot)
-  - `gpt-5-nano` (2026-04-10, finalized 2026-04-12, 20-row pilot)
-  - `gpt-5-mini` (2026-04-12, 40-row expanded same-set)
-  - `gpt-5-nano` (2026-04-12, 40-row expanded same-set)
-  - **`gpt-5-mini` (2026-04-13, full-v1 canonical, 120 rows) — headline result**
-
-## Canonical full-v1 result
+## Canonical Full-v1 Result
 
 - run: `runs/real_openai_gpt5mini_v1_120_20260413`
-- dataset: `data/examples_v1_120.csv` (120 rows)
-- provider: `OpenAI`
 - model: `gpt-5-mini`
-- judge: `gpt-5-mini` (OpenAI Responses API)
-- prompt version: `minimal_patient_facing_system_prompt_v1`
+- provider: `OpenAI`
+- judge: `gpt-5-mini`
 - scored rows: `120/120`
 
-### Headline metrics
+### Headline Metrics
 
-| metric | value |
-|---|---:|
-| `overall_rubric_score` (0-2 scale) | `1.7633` |
-| `grade_fidelity_accuracy` | `0.8917` |
-| `C_grade_preference_omission_rate` | `0.5938` |
-| `I_statement_overrecommendation_rate` | `0.0312` |
-| `unsupported_directive_rate` | `0.0083` |
+| metric | value | 95% CI |
+|---|---:|---:|
+| `overall_rubric_score` | `1.7633` | `[1.7067, 1.8133]` |
+| `grade_fidelity_accuracy` | `0.8917` | `[0.8333, 0.9417]` |
+| `C_grade_preference_omission_rate` | `0.5938` | `[0.4062, 0.75]` |
+| `I_statement_overrecommendation_rate` | `0.0312` | `[0.0, 0.0938]` |
+| `unsupported_directive_rate` | `0.0083` | `[0.0, 0.025]` |
 
-### Average score by rubric dimension (0-2 scale)
+### Dimension Means
 
-| dimension | score |
+| dimension | mean |
 |---|---:|
 | `recommendation_fidelity` | `1.875` |
 | `evidence_strength_and_uncertainty_fidelity` | `1.4917` |
@@ -65,141 +54,129 @@ The benchmark targets **recommendation-posture fidelity** — not general medica
 | `action_safety` | `1.975` |
 | `communication_clarity` | `1.925` |
 
-### Benchmark composition (full-v1)
+### Canonical Takeaway
 
-| grade | count | | task family | count |
-|---|---:|---|---|---:|
-| `A` | 16 | | `direct_recommendation` | 36 |
-| `B` | 24 | | `expert_explanation` | 48 |
-| `C` | 32 | | `preference_sensitive` | 16 |
-| `D` | 16 | | `uncertainty_elicitation` | 20 |
-| `I` | 32 | | | |
+The canonical result is strong on directional fidelity and action safety, but not on posture nuance:
 
-### Observed failure counts (full-v1)
+- `unsupported_directive_rate` is low
+- overt grade reversal is rare
+- the dominant misses are `missing uncertainty disclosure` and `preference omission`
+- `C`-grade shared-decision framing remains the single clearest weak surface
 
-| failure type | count |
-|---|---:|
-| `missing uncertainty disclosure` | 39 |
-| `preference omission` | 33 |
-| `plausible but ungrounded claim` | 2 |
-| `grade deflation` | 1 |
-| `unsupported directive` | 1 |
+This supports the original benchmark hypothesis: modern models often preserve the topic and the rough direction of a recommendation while still flattening the parts of the answer that carry uncertainty or patient preference.
 
-### Failures by grade
+## Cross-Provider Extension
 
-| grade | dominant failure modes |
-|---|---|
-| `A` | preference omission (1), plausible but ungrounded claim (1) |
-| `B` | missing uncertainty disclosure (11), preference omission (8), grade deflation (1) |
-| `C` | missing uncertainty disclosure (19), preference omission (19) |
-| `D` | missing uncertainty disclosure (3), preference omission (1) |
-| `I` | missing uncertainty disclosure (6), preference omission (4), plausible but ungrounded claim (1), unsupported directive (1) |
+All four models were run on the same `120` rows with the same primary judge prompt and rubric.
 
-## Full-v1 takeaway
+| metric | gpt-5-mini | deepseek-chat | claude-haiku-4-5 | claude-sonnet-4-6 |
+|---|---:|---:|---:|---:|
+| `overall_rubric_score` | `1.7633` | `1.59` | `1.675` | `1.6286` |
+| `grade_fidelity_accuracy` | `0.8917` | `0.7333` | `0.7833` | `0.8655` |
+| `C_grade_preference_omission_rate` | `0.5938` | `0.5938` | `0.4688` | `0.0938` |
+| `I_statement_overrecommendation_rate` | `0.0312` | `0.1875` | `0.1875` | `0.125` |
+| `unsupported_directive_rate` | `0.0083` | `0.0667` | `0.0583` | `0.0756` |
 
-- **Action safety is high.** `unsupported_directive_rate` is `0.0083` (1/120) and `action_safety` averages `1.975/2.0`. Overtly unsafe directive language is rare.
-- **Grade fidelity is strong.** `0.8917` of rows preserve the intended A/B/C/D/I posture. Only 1 grade deflation and 0 grade inflations in the scored set.
-- **The core failure surface is posture *flavor*, not posture direction.** The two largest failure modes — `missing uncertainty disclosure` (39) and `preference omission` (33) — are both *omissions of nuance*, not directional errors.
-- **`C grade` is the single weakest dimension.** `C_grade_preference_omission_rate` is `0.5938` (19/32 rows). On topics where patient values are load-bearing, the model defaults to a declarative posture over half the time.
-- **`I statement` overrecommendation is contained but non-zero.** `I_statement_overrecommendation_rate` is `0.0312` (1/32). The model generally respects evidence insufficiency, with one exception.
-- **The `preference_sensitivity` dimension (1.55) and `evidence_strength_and_uncertainty_fidelity` dimension (1.4917) are the lowest-scoring rubric dimensions**, consistent with the failure-count distribution.
+### Calibrated Findings
 
-## Cross-provider extension (same 120-row benchmark, three providers)
+**Finding 1 — GPT-5 remains the strongest overall result on the current frozen benchmark.**
 
-The full-v1 canonical benchmark was run against three models from three different training pipelines, with judge, prompt, and rubric held constant.
+- `gpt-5-mini` vs `deepseek-chat`: overall delta `-0.1733`, `95% CI [-0.26, -0.085]`
+- `gpt-5-mini` vs `claude-sonnet-4-6`: overall delta `-0.1327`, `95% CI [-0.2134, -0.0521]`
+- `gpt-5-mini` vs `claude-haiku-4-5`: overall delta `-0.0883`, `95% CI [-0.1817, 0.0]`
 
-| run | model | provider |
-|---|---|---|
-| `runs/real_openai_gpt5mini_v1_120_20260413` | `gpt-5-mini` | OpenAI |
-| `runs/real_deepseek_chat_v1_120_20260413` | `deepseek-chat` | DeepSeek |
-| `runs/real_anthropic_haiku45_v1_120_20260413` | `claude-haiku-4-5-20251001` | Anthropic |
+The GPT lead is clearly supported against DeepSeek and Sonnet on overall rubric score. The GPT-vs-Haiku overall difference is smaller and should be described more cautiously.
 
-All three runs are `120/120` scored by the same `gpt-5-mini` judge.
+**Finding 2 — Sonnet is still the strongest observed model on `C`-grade preference omission, but that result should be read as slice-specific rather than globally “best”.**
 
-### Three-way headline comparison
+- Sonnet vs GPT on `C_grade_preference_omission_rate`: delta `-0.5`, `95% CI [-0.6875, -0.3125]`
+- Sonnet vs DeepSeek on the same metric: delta `-0.5`, `95% CI [-0.6562, -0.3438]`
+- Sonnet vs Haiku on the same metric: delta `-0.375`, `95% CI [0.1875, 0.5625]` when read as Haiku minus Sonnet
 
-| metric | gpt-5-mini | deepseek-chat | claude-haiku-4-5 |
-|---|---:|---:|---:|
-| `overall_rubric_score` (0-2) | **`1.7633`** | `1.59` | `1.675` |
-| `grade_fidelity_accuracy` | **`0.8917`** | `0.7333` | `0.7833` |
-| `C_grade_preference_omission_rate` | `0.5938` | `0.5938` | **`0.4688`** |
-| `I_statement_overrecommendation_rate` | **`0.0312`** | `0.1875` | `0.1875` |
-| `unsupported_directive_rate` | **`0.0083`** | `0.0667` | `0.0583` |
+This is the cleanest replicated Sonnet advantage in the current release candidate.
 
-### Headline findings from three providers
+**Finding 3 — GPT’s `I`-statement advantage remains directionally strongest, but not every pairwise difference is cleanly separated at this sample size.**
 
-**Finding 1 — C-grade preference omission is high on every provider (47-59%), with Anthropic reducing it by about a quarter.** All three models miss preference on nearly half of C-grade rows or more. `gpt-5-mini` and `deepseek-chat` converge at an identical `59.4%` (`19/32`); `claude-haiku-4-5` is the best at `46.9%` (`15/32`). The failure mode replicates with similar magnitude across three entirely different training pipelines, but is partially addressable through tuning — even the best of three providers still omits preference on nearly half of preference-sensitive rows.
+- GPT vs DeepSeek on `I_statement_overrecommendation_rate`: delta `0.1563`, `95% CI [0.0312, 0.2812]`
+- GPT vs Sonnet on the same metric: delta `0.0938`, `95% CI [-0.0312, 0.25]`
+- GPT vs Haiku on the same metric: delta `0.1563`, `95% CI [0.0, 0.3125]`
 
-**Finding 2 — GPT-5's I-statement calibration is distinctive, not generic "Western safety tuning".** A naive prior would predict both `gpt-5-mini` and `claude-haiku-4-5` to outperform `deepseek-chat` on insufficient-evidence rows. That prior is wrong: `claude-haiku-4-5` matches DeepSeek at `18.75%` I-statement overrecommendation, `6×` worse than `gpt-5-mini`. The advantage is OpenAI-specific at this model tier, not a general property of large safety-tuned models.
+The qualitative story still favors GPT on insufficient-evidence calibration, but the Sonnet gap should not be overstated as a settled separation yet.
 
-**Finding 3 — Haiku uniquely over-hedges on Grade A rows.** `claude-haiku-4-5` is the only model that produced grade deflations on strong-evidence A-grade rows (`2/16`). The other two models produced zero A-row deflations. This is Haiku's distinctive failure signature, mirroring its strength on preference-sensitive rows.
+**Finding 4 — Sonnet’s A/D/I anomaly remains provisional.**
 
-Full per-grade, per-dimension, per-failure decomposition is in [`reports/cross_provider_comparison_v1_120_20260413.md`](cross_provider_comparison_v1_120_20260413.md).
+Automated scoring still assigns Sonnet very high `preference omission` counts on `A/D/I` rows. But:
 
-## Expanded 40-row same-set stress test
+- the benchmark taxonomy was originally designed around when preference framing is explicitly required
+- the same report family now carries a blinded adjudication packet for this anomaly
+- current adjudication state is `incomplete`
 
-The canonical result is accompanied by an independent 40-row same-set head-to-head (`examples_v1_40.csv`) between `gpt-5-mini` and `gpt-5-nano`. This slice was annotation-frozen after two adjudication refreshes and a final residual reread.
+So the A/D/I Sonnet anomaly should be described as an unresolved adjudication question, not a final model signature.
 
-| run | overall_rubric_score | grade_fidelity_accuracy | C_preference_omission | I_overrecommendation | unsupported_directive |
-|---|---:|---:|---:|---:|---:|
-| `gpt-5-mini` (40-row) | `1.805` | `0.85` | `0.125` | `0.125` | `0.025` |
-| `gpt-5-nano` (40-row) | `1.835` | `0.80` | `0.0` | `0.0` | `0.0` |
+## Sonnet Adjudication Status
 
-Key observations:
+Packet location:
 
-- The 40-row slice is *not* a strict subset of the 120-row full-v1, so metric values are not directly comparable row-for-row. It serves as an independent stress test of which model is more stable under the same prompts.
-- On the 40-row same-set, `gpt-5-nano` slightly outperformed `gpt-5-mini` on `overall_rubric_score` and was clean on all three safety-sensitive posture metrics (`C_preference_omission`, `I_overrecommendation`, `unsupported_directive` all `0.0`).
-- `gpt-5-mini` retained a small edge on `grade_fidelity_accuracy` (0.85 vs 0.80).
-- The flip relative to the 20-row pilot survived two adjudication refreshes and a final reread, and `gpt-5-nano`'s advantage is concentrated on the benchmark's posture-sensitive rows (`C` and `I`).
+- `runs/real_anthropic_sonnet46_v1_120_20260414/adjudication/`
 
-See `reports/expanded_same_set_public_draft_20260413.md` for the manuscript-style narrative and `reports/annotation_freeze_notes_v1_40_20260413.md` for the freeze record.
+Current scaffold:
 
-## Prior pilot (20-row) and smoke-test results
+- `adjudication_packet.csv`
+- `rater_a_sheet.csv`
+- `rater_b_sheet.csv`
+- `final_adjudication_sheet.csv`
+- `adjudication_merged.csv`
+- `agreement_summary.json`
+- `judge_sensitivity_sheet.csv`
+- `judge_sensitivity_summary.md`
+- `../judge_sensitivity.json`
+- `judge_disagreement_rows.csv`
+- `judge_disagreement_summary.json`
+- `judge_disagreement_brief.md`
 
-Retained as methodological context. These were useful for establishing rubric discrimination but are superseded by the full-v1 and expanded same-set runs as evaluation evidence.
+Current state:
 
-### Smoke-test discrimination check
+- packet rows: `53`
+- completed rows: `0`
+- finalized rows: `0`
+- status: `incomplete`
+- judge sensitivity status: `complete`
+- preference-sensitivity exact agreement (`primary` vs `haiku`): `0.0755`
+- failure-label exact-match rate (`primary` vs `haiku`): `0.0`
+- secondary judge labeled `preference omission` on only `4/53` rows and left failure labels blank on `47/53`
+- a reviewer-facing disagreement queue now ranks the same packet for adjudication focus
+- reviewer queue buckets: `24 critical`, `29 high`
+- dominant failure transition: `preference omission -> <blank>` on `46/53` rows
 
-| run | overall_rubric_score | grade_fidelity_accuracy | C_preference_omission | I_overrecommendation | unsupported_directive |
-|---|---:|---:|---:|---:|---:|
-| `demo_handcrafted_reference` | `2.0` | `1.0` | `0.0` | `0.0` | `0.0` |
-| `demo_overconfident_baseline` | `1.16` | `0.4` | `1.0` | `1.0` | `0.6` |
+The completed sensitivity pass does not resolve the Sonnet anomaly in favor of the original automated interpretation. Instead, it sharpens the methodological concern: recommendation direction, uncertainty fidelity, and action safety stay relatively aligned across judges, but `preference_sensitivity` and failure-label assignment diverge sharply on this packet. Until the blinded human sheets are filled and merged, the Sonnet-specific `A/D/I preference omission` interpretation remains provisional.
 
-The rubric separates a handcrafted reference from an intentionally overconfident baseline on the posture-sensitive metrics. See `reports/demo_smoke_test_runs.md` and `reports/demo_qualitative_cases.md`.
+## Supporting 40-row Same-set Stress Test
 
-### 20-row pilot real-run snapshot
+The frozen `40`-row comparison between `gpt-5-mini` and `gpt-5-nano` remains useful as a **supporting stress test**, not as the primary release benchmark.
+
+Headline values on that slice:
 
 | run | overall_rubric_score | grade_fidelity_accuracy | C_preference_omission | I_overrecommendation | unsupported_directive |
 |---|---:|---:|---:|---:|---:|
-| `gpt-5-mini` (20-row pilot) | `1.93` | `0.95` | `0.0` | `0.0` | `0.0` |
-| `gpt-5-nano` (20-row pilot) | `1.79` | `0.85` | `0.75` | `0.0` | `0.0` |
+| `gpt-5-mini` | `1.805` | `0.85` | `0.125` | `0.125` | `0.025` |
+| `gpt-5-nano` | `1.835` | `0.80` | `0.0` | `0.0` | `0.0` |
 
-On the original 20-row pilot, `gpt-5-mini` led. The flip on the expanded 40-row set is the most informative observation from this progression — which motivated running the full-v1 canonical.
+This slice remains useful because it shows that ordering can flip when the benchmark becomes more concentrated in `C/I` posture-sensitive cases. It should not replace the `120`-row canonical result in release messaging.
 
-## Observed failure pattern across runs
+## Current Release-Candidate View
 
-Across the 20-row pilot, 40-row expanded same-set, and 120-row full-v1 canonical, the dominant failure modes are consistently:
+The repo now supports a more calibrated claim set than earlier drafts:
 
-1. **`missing uncertainty disclosure`** — the model states a recommendation without flagging the strength of evidence behind it.
-2. **`preference omission`** — on `C grade` and `preference_sensitive` task rows, the model delivers a declarative recommendation rather than framing the decision around patient values.
+- the benchmark cleanly surfaces posture-sensitive failure modes
+- GPT currently looks strongest overall on the frozen `120` rows
+- Sonnet looks strongest on the `C`-grade omission slice
+- the strongest unresolved question is how much of Sonnet’s `A/D/I preference omission` spike is genuine model behavior versus judge/taxonomy artifact
 
-Directional failures (`grade inflation`, `grade deflation`, `unsupported directive`, `I_statement overrecommendation`) are rare in every run. This is consistent with the benchmark hypothesis that modern production models rarely produce overtly unsafe directives on well-curated preventive-care prompts — but do systematically *flatten nuance* in posture-sensitive contexts.
+That last question is now explicitly carried as an adjudication task rather than hidden inside prose.
 
-## First-read takeaway for external readers
+## Outstanding Work
 
-The point of this benchmark is **not** to rank models on medical-fact accuracy. It is to ask whether a model, given a well-specified evidence posture, preserves:
-
-- the strength of the recommendation
-- the honest disclosure of uncertainty
-- the acknowledgment that some decisions depend on patient values
-
-The full-v1 result on `gpt-5-mini` shows high action safety and strong directional fidelity, but a clear and reproducible weakness on **preference-sensitive framing** (`C grade`) and **uncertainty phrasing** (across grades). These are the two dimensions that this benchmark was designed to surface, and the v1 run surfaces them cleanly.
-
-## Outstanding work
-
-1. Add `claude-sonnet-4` on the same 120 items to test whether Haiku's I-statement gap vs `gpt-5-mini` and its A-grade over-hedging are scale-sensitive within Anthropic's lineage.
-2. Add an open Llama-family model (e.g. `Llama-3.3-70B-Instruct` via Together or Groq) to test whether a model without vendor-specific health safety post-training lands near the Haiku end (`47%`) or the GPT/DeepSeek end (`59%`) of C-grade preference omission. This disambiguates vendor-tuning vs architecture as the source of the variation.
-3. Consider Gemini 2.5 Flash for a fourth independent training pipeline.
-4. Generate publication-ready PNG figures for the full-v1 canonical and three-way cross-provider comparison.
-5. Consider dual-human adjudication on the 14 rows re-judged after the quota-blocked retry, to confirm no systematic judge drift relative to the first-pass 106.
-6. Decide whether to freeze v1 at the current 120-item set or expand to v1.1 (adjacent guideline sources, e.g. AAFP, ACP) before external release.
+1. Complete the blinded Sonnet adjudication sheets and merge the final dispositions.
+2. Use `adjudication/judge_disagreement_brief.md` and `adjudication/judge_disagreement_rows.csv` to focus adjudication on the `preference_sensitivity` rubric and failure-label semantics.
+3. If the blinded merge confirms taxonomy misuse, revise `preference omission` before making broader claims.
+4. After the adjudicated v1 release candidate is stable, consider new provider lineages such as Llama or Gemini.

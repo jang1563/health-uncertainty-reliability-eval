@@ -4,11 +4,23 @@ import argparse
 import json
 from pathlib import Path
 
+from render_run_figures import export_png
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Render demo SVG figures from run summaries.")
     parser.add_argument("--runs-root", required=True, help="Root directory containing run subdirectories.")
     parser.add_argument("--figures-dir", required=True, help="Directory to write SVG figures.")
+    parser.add_argument(
+        "--skip-png",
+        action="store_true",
+        help="Write SVG only and skip PNG export.",
+    )
+    parser.add_argument(
+        "--require-png",
+        action="store_true",
+        help="Fail if PNG export cannot be completed.",
+    )
     return parser.parse_args()
 
 
@@ -197,11 +209,23 @@ def main():
     figures_dir = Path(args.figures_dir)
     figures_dir.mkdir(parents=True, exist_ok=True)
 
-    render_metric_comparison(summaries, figures_dir / "demo_run_metric_comparison.svg")
-    render_failure_comparison(summaries, figures_dir / "demo_failure_count_comparison.svg")
+    metric_svg = figures_dir / "demo_run_metric_comparison.svg"
+    failure_svg = figures_dir / "demo_failure_count_comparison.svg"
+    metric_png = figures_dir / "demo_run_metric_comparison.png"
+    failure_png = figures_dir / "demo_failure_count_comparison.png"
 
-    print(f"Wrote {figures_dir / 'demo_run_metric_comparison.svg'}")
-    print(f"Wrote {figures_dir / 'demo_failure_count_comparison.svg'}")
+    render_metric_comparison(summaries, metric_svg)
+    render_failure_comparison(summaries, failure_svg)
+
+    print(f"Wrote {metric_svg}")
+    print(f"Wrote {failure_svg}")
+    if not args.skip_png:
+        metric_exported = export_png(metric_svg, metric_png, require_png=args.require_png)
+        failure_exported = export_png(failure_svg, failure_png, require_png=args.require_png)
+        if metric_exported:
+            print(f"Wrote {metric_png}")
+        if failure_exported:
+            print(f"Wrote {failure_png}")
 
 
 if __name__ == "__main__":

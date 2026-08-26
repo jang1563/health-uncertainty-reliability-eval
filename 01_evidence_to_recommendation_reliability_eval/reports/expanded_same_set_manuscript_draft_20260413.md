@@ -1,9 +1,9 @@
-# Recommendation-Posture Reliability in Patient-Facing Preventive Care Answers
+# Supporting Manuscript Draft: Recommendation-Posture Reliability in Patient-Facing Preventive Care Answers
 
-- checked_on: `2026-04-13`
-- artifact_type: `manuscript-style draft`
-- benchmark_slice: `examples_v1_40.csv` (primary comparison) plus `examples_v1_120.csv` (full-v1 canonical extension)
-- freeze_status: `working frozen after two adjudication refresh passes plus final residual reread; full-v1 canonical gpt-5-mini run complete`
+- checked_on: `2026-04-16`
+- artifact_type: `supporting manuscript-style draft`
+- benchmark_slice: `examples_v1_40.csv` (supporting stress test) with `examples_v1_120.csv` as the canonical release benchmark
+- freeze_status: `working frozen after two adjudication refresh passes plus final residual reread; retained as supporting manuscript context after the canonical full-v1 release package`
 - supporting_artifacts:
   - `reports/expanded_same_set_public_draft_20260413.md`
   - `reports/expanded_same_set_external_brief_20260413.md`
@@ -15,9 +15,11 @@
   - `figures/real_v1_40_failure_count_comparison.svg`
   - `runs/real_openai_gpt5mini_v1_120_20260413/summary.md`
 
+> Status note: this manuscript-style draft is now a supporting artifact for the `40`-row stress test. The release-facing narrative lives in `reports/health_reliability_eval_v1.md`, which treats the frozen `120`-row benchmark as canonical and marks the `40`-row materials as supporting analyses.
+
 ## Abstract
 
-Large language model evaluation in health care often emphasizes factual correctness or broad safety behavior, but many patient-facing failures occur at a narrower layer: the model preserves the topic while distorting recommendation strength, uncertainty, or preference sensitivity. We built a small benchmark slice to stress this failure mode using preventive-care questions derived from `USPSTF + AHRQ` recommendation contexts. The frozen comparison slice contained `40` paraphrased prompts balanced across recommendation grades `A/B/C/D/I` and across task families including direct recommendation, expert explanation, uncertainty elicitation, and preference-sensitive framing. We compared `gpt-5-mini` and `gpt-5-nano` using a five-dimension rubric covering recommendation fidelity, evidence/uncertainty fidelity, preference sensitivity, action safety, and communication clarity.
+Large language model evaluation in health care often emphasizes factual correctness or broad safety behavior, but many patient-facing failures occur at a narrower layer: the model preserves the topic while distorting recommendation strength, uncertainty, or preference sensitivity. We built a small benchmark slice to stress this failure mode using preventive-care questions derived from `USPSTF + AHRQ` recommendation contexts. The frozen comparison slice contained `40` paraphrased prompts balanced across recommendation grades `A/B/C/D/I` and across task families including direct recommendation, expert explanation, uncertainty elicitation, and preference-sensitive framing. We compared `gpt-5-mini` and `gpt-5-nano` using a five-dimension rubric covering recommendation fidelity, evidence/uncertainty fidelity, preference sensitivity, action safety, and communication clarity. This draft should now be read as supporting stress-test context for the canonical `120`-row release report rather than as the main standalone benchmark narrative.
 
 On this slice, `gpt-5-nano` slightly outperformed `gpt-5-mini` on overall rubric score (`1.835` vs `1.805`) and was cleaner on the benchmark's most safety-sensitive posture metrics: `C`-grade preference omission (`0.0` vs `0.125`), `I`-statement overrecommendation (`0.0` vs `0.125`), and unsupported directive rate (`0.0` vs `0.025`). `gpt-5-mini` retained a small advantage on direct grade fidelity (`0.85` vs `0.80`). The largest split was a single older-adult anxiety-screening `I`-statement row where `gpt-5-mini` converted insufficient evidence into an affirmative recommendation. These results suggest that recommendation-posture fidelity is a distinct evaluation target and that model ordering can change materially when the benchmark emphasizes `C` and `I` recommendation contexts.
 
@@ -189,42 +191,44 @@ The `40`-row slice is a paired comparison between `gpt-5-mini` and `gpt-5-nano`;
 
 ## Cross-provider extension
 
-To test whether the failure signature observed on `gpt-5-mini` is GPT-family-specific or structural, the same `120`-row benchmark was run against two additional providers: `deepseek-chat` (DeepSeek V3) and `claude-haiku-4-5-20251001` (Anthropic). Judge model (`gpt-5-mini`), judge prompt, rubric, and benchmark items are held constant — only the target model varies. The three providers span three distinct instruction-tuning pipelines.
+To test whether the failure signature observed on `gpt-5-mini` is GPT-family-specific or structural, the same `120`-row benchmark was run against three additional models: `deepseek-chat` (DeepSeek V3), `claude-haiku-4-5-20251001` (Anthropic), and `claude-sonnet-4-6` (Anthropic). Judge model (`gpt-5-mini`), judge prompt, rubric, and benchmark items are held constant — only the target model varies. The four-model set spans three distinct instruction-tuning lineages. Sonnet generated all `120` rows but is `119/120` scored because one A-grade row missed a judge response.
 
-### Three-way headline comparison
+### Four-way headline comparison
 
-| metric | gpt-5-mini | deepseek-chat | claude-haiku-4-5 |
-|---|---:|---:|---:|
-| `overall_rubric_score` (0-2) | `1.7633` | `1.59` | `1.675` |
-| `grade_fidelity_accuracy` | `0.8917` | `0.7333` | `0.7833` |
-| `C_grade_preference_omission_rate` | `0.5938` | `0.5938` | `0.4688` |
-| `I_statement_overrecommendation_rate` | `0.0312` | `0.1875` | `0.1875` |
-| `unsupported_directive_rate` | `0.0083` | `0.0667` | `0.0583` |
+| metric | gpt-5-mini | deepseek-chat | claude-haiku-4-5 | claude-sonnet-4-6 |
+|---|---:|---:|---:|---:|
+| `overall_rubric_score` (0-2) | `1.7633` | `1.59` | `1.675` | `1.6286` |
+| `grade_fidelity_accuracy` | `0.8917` | `0.7333` | `0.7833` | `0.8655` |
+| `C_grade_preference_omission_rate` | `0.5938` | `0.5938` | `0.4688` | `0.0938` |
+| `I_statement_overrecommendation_rate` | `0.0312` | `0.1875` | `0.1875` | `0.125` |
+| `unsupported_directive_rate` | `0.0083` | `0.0667` | `0.0583` | `0.0756` |
 
-### Three-way failure-count comparison
+### Four-way failure-count comparison
 
-| failure label | gpt-5-mini | deepseek-chat | claude-haiku-4-5 |
-|---|---:|---:|---:|
-| `missing uncertainty disclosure` | `39` | `55` | `39` |
-| `preference omission` | `33` | `32` | `28` |
-| `grade inflation` | `0` | `7` | `7` |
-| `grade deflation` | `1` | `3` | `4` |
-| `unsupported directive` | `1` | `8` | `7` |
-| `plausible but ungrounded claim` | `2` | `1` | `0` |
+| failure label | gpt-5-mini | deepseek-chat | claude-haiku-4-5 | claude-sonnet-4-6 |
+|---|---:|---:|---:|---:|
+| `missing uncertainty disclosure` | `39` | `55` | `39` | `6` |
+| `preference omission` | `33` | `32` | `28` | `61` |
+| `grade inflation` | `0` | `7` | `7` | `4` |
+| `grade deflation` | `1` | `3` | `4` | `3` |
+| `unsupported directive` | `1` | `8` | `7` | `9` |
+| `plausible but ungrounded claim` | `2` | `1` | `0` | `0` |
 
-### Three-way findings
+### Four-way findings
 
-**Finding 1 — C-grade preference omission is a high-frequency failure on every provider (`47-59%`), with Anthropic tuning providing a partial but incomplete mitigation.** All three models miss preference on `15-19` of `32` C-grade rows. `gpt-5-mini` and `deepseek-chat` converge at an identical `59.4%` (`19/32`), while `claude-haiku-4-5` reaches `46.9%` (`15/32`) — a `12.5`-point reduction but still a majority-of-the-time failure. The replication across three independent training pipelines at this magnitude is consistent with a structural property of current instruction-tuned LLMs: a systematic preference for confident declarative answers over preference-eliciting ones on shared-decision content. The Anthropic result shows that targeted tuning can move the rate, but does not eliminate the failure. This is the single most externally-informative finding in the three-way extension, and stronger than the two-provider version of the claim, because it establishes both the high-frequency floor and the partial-tractability ceiling.
+**Finding 1 — C-grade preference omission is both replicated and clearly tractable once Sonnet is added.** The four-model range is now `9.4-59.4%`. `gpt-5-mini` and `deepseek-chat` remain tied at `59.4%` (`19/32`), `claude-haiku-4-5` improves to `46.9%` (`15/32`), and `claude-sonnet-4-6` drops to `9.4%` (`3/32`). The interpretation shifts from "all current models fail similarly" to a stronger claim: the failure is structural enough to replicate across lineages, but not so rigid that tuned models cannot nearly eliminate it on the benchmark's most preference-sensitive rows.
 
-**Finding 2 — GPT-5's I-statement calibration is distinctive, not generic "western safety tuning".** A naive prior would predict that both `gpt-5-mini` and `claude-haiku-4-5` should outperform `deepseek-chat` on insufficient-evidence rows. That prior is falsified: `claude-haiku-4-5` matches DeepSeek at `18.75%` I-statement overrecommendation (vs `3.12%` for `gpt-5-mini`). The failure *shapes* differ — DeepSeek concentrates failures on missing uncertainty disclosure, Haiku produces more grade inflations and unsupported directives on I rows — but the net rate of converting insufficient evidence to affirmative recommendation is the same. The I-row advantage appears specific to OpenAI's post-training work on this content type, and does not generalize to other major US-aligned providers at this model tier. Whether a larger Claude model (`claude-sonnet-4`) closes the gap is an open empirical question.
+**Finding 2 — GPT-5 remains best on insufficient-evidence calibration, but Sonnet narrows the Anthropic gap.** `gpt-5-mini` remains the strongest model on I-statement overrecommendation (`3.12%`). `claude-haiku-4-5` and `deepseek-chat` remain tied at `18.75%`. `claude-sonnet-4-6` improves to `12.5%`, which is still materially worse than GPT but no longer identical to the DeepSeek/Haiku profile. The I-row advantage still appears specific to OpenAI's post-training on this content type, but larger Claude scale narrows the gap.
 
-**Finding 3 — Haiku uniquely over-hedges on Grade A (strong-evidence) rows.** `claude-haiku-4-5` is the only model that produced grade deflations on Grade A rows (`2/16`). Both `gpt-5-mini` and `deepseek-chat` produced zero A-row deflations. This is Haiku's distinctive failure signature and the mirror of its strength on preference sensitivity: the model that most readily acknowledges patient values on C rows is also the model most likely to under-recommend on strongly supported interventions. No simple "safer is better" narrative holds across the whole grade spectrum.
+**Finding 3 — Haiku's Grade A over-hedging does not simply intensify with Anthropic scale.** `claude-haiku-4-5` remains the only model with A-grade deflations (`2/16`). `claude-sonnet-4-6` produces zero A-grade deflations, so the original Haiku signature does not scale straightforwardly. But Sonnet is not behaviorally simple on A rows either: the judge frequently codes its answers as `preference omission`, which points to a different kind of posture distortion.
 
-**Finding 4 — The coupling between missing-uncertainty and unsupported-directive failures observed between GPT-5 and DeepSeek does not cleanly generalize.** At two providers, the two failures appeared to track each other (one underlying failure mode). At three, they decouple: `claude-haiku-4-5` has the same missing-uncertainty count as `gpt-5-mini` (both `39`) but the unsupported-directive count of DeepSeek-range (`7` vs `8`). Haiku's unsupported-directive failures concentrate on I rows (`4/7`) and preference-sensitive rows, suggesting a secondary failure mode separable from posture flattening.
+**Finding 4 — Missing-uncertainty and unsupported-directive failures decouple more sharply in the four-model set.** Sonnet has the lowest missing-uncertainty count in the comparison (`6`) and the highest unsupported-directive count (`9`). That is the clearest evidence in the project so far that the two failure categories are not just one underlying problem expressed in two ways. A model can preserve uncertainty language unusually well and still drift into overly directive framing elsewhere.
+
+**Finding 5 — Sonnet's most important trade-off is an anomalous A/D/I preference-omission spike.** Sonnet is the best model on C-grade omission and the strongest on `evidence_strength_and_uncertainty_fidelity` (`1.8319`), yet it is scored for `preference omission` on `11/16` A rows, `13/16` D rows, and `26/32` I rows. That pushes its `preference_sensitivity` dimension to `0.8908`, the lowest of the four models. The leading explanations are either over-application of preference-hedging language to rows where the benchmark expects clearer posture, or a judge-model interaction in which Sonnet's cautious style is being over-penalized. This cannot be resolved without dual-human adjudication.
 
 ### Generalization caveat
 
-This is a three-provider comparison covering three of the four major instruction-tuning lineages of 2026 (OpenAI, Anthropic, DeepSeek). A Google Gemini run and an open Llama-family run without vendor-specific health safety tuning would test whether the findings above hold at four. Finding 1 is the most portable — it describes a replicated high-frequency failure at a broad magnitude range. Findings 2 and 3 describe specific model-pair gaps and should be read as empirical observations within this three-provider set, not as universal claims.
+This is a four-model comparison covering three of the major instruction-tuning lineages of 2026 (OpenAI, Anthropic, DeepSeek). A Google Gemini run and an open Llama-family run without vendor-specific health safety tuning would test whether the findings above extend beyond this four-model set. Finding 1 is the most portable because it now describes both a replicated high-frequency failure and a concrete lower bound under stronger Anthropic tuning. Finding 5 is the least settled because it depends most strongly on the interaction between Sonnet's stylistic choices and the current judge.
 
 
 

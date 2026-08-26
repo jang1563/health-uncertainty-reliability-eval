@@ -1,19 +1,23 @@
 #!/usr/bin/env python3
 
 import argparse
-import csv
 import json
-from collections import Counter, defaultdict
 from pathlib import Path
 
-
-SCORE_COLUMNS = [
-    "recommendation_fidelity",
-    "evidence_strength_and_uncertainty_fidelity",
-    "preference_sensitivity",
-    "action_safety",
-    "communication_clarity",
-]
+from e2r_metrics import (
+    DEFAULT_BOOTSTRAP_SAMPLES,
+    DEFAULT_BOOTSTRAP_SEED,
+    PRIMARY_METRICS,
+    compute_summary,
+    detect_adjudication_status,
+    detect_chair_reconciliation,
+    detect_judge_disagreement,
+    detect_judge_sensitivity,
+    load_annotation_rows,
+    load_judge_metadata,
+    maybe_load_json,
+    write_json,
+)
 
 
 def parse_args():
@@ -23,213 +27,300 @@ def parse_args():
     parser.add_argument("--annotations", required=True, help="Path to annotated CSV.")
     parser.add_argument("--summary-json", required=True, help="Path to output summary JSON.")
     parser.add_argument("--summary-md", required=True, help="Path to output summary Markdown.")
+    parser.add_argument(
+        "--judge-metadata",
+        help="Optional path to judge_metadata.json. Defaults to <run_dir>/judge_metadata.json when available.",
+    )
+    parser.add_argument(
+        "--adjudication-summary",
+        help="Optional path to adjudication agreement_summary.json. Defaults to <run_dir>/adjudication/agreement_summary.json when available.",
+    )
+    parser.add_argument(
+        "--judge-sensitivity",
+        help="Optional path to judge_sensitivity.json. Defaults to <run_dir>/judge_sensitivity.json when available.",
+    )
+    parser.add_argument(
+        "--judge-disagreement",
+        help="Optional path to judge_disagreement_summary.json. Defaults to <run_dir>/adjudication/judge_disagreement_summary.json when available.",
+    )
+    parser.add_argument(
+        "--chair-reconciliation",
+        help="Optional path to chair_reconciliation_summary.json. Defaults to <run_dir>/adjudication/chair_reconciliation_summary.json when available.",
+    )
+    parser.add_argument(
+        "--bootstrap-samples",
+        type=int,
+        default=DEFAULT_BOOTSTRAP_SAMPLES,
+        help="Bootstrap samples used for per-run confidence intervals.",
+    )
+    parser.add_argument(
+        "--bootstrap-seed",
+        type=int,
+        default=DEFAULT_BOOTSTRAP_SEED,
+        help="Random seed used for deterministic bootstrap intervals.",
+    )
     return parser.parse_args()
 
 
-def read_rows(path):
-    with open(path, newline="", encoding="utf-8") as handle:
-        return list(csv.DictReader(handle))
+def format_interval(interval):
+    if not interval:
+        return ""
+    return f"[{interval['lower']}, {interval['upper']}]"
 
 
-def parse_score(value):
-    if value is None:
-        return None
-    value = value.strip()
-    if value == "":
-        return None
-    try:
-        score = int(value)
-    except ValueError as exc:
-        raise ValueError(f"Invalid score value: {value}") from exc
-    if score not in (0, 1, 2):
-        raise ValueError(f"Score must be 0, 1, or 2. Got: {score}")
-    return score
+def format_value(value):
+    if isinstance(value, (dict, list)):
+        return json.dumps(value, ensure_ascii=False, sort_keys=True)
+    return value
 
 
-def split_failures(value):
-    if not value:
-        return []
-    return [item.strip() for item in value.split(";") if item.strip()]
+def add_key_value_lines(lines, pairs):
+    for key, value in pairs:
+        lines.append(f"- `{key}`: `{format_value(value)}`")
 
 
-def average(values):
-    return round(sum(values) / len(values), 4) if values else None
+def resolve_run_context(
+    annotation_path,
+    judge_metadata_arg,
+    adjudication_arg,
+    judge_sensitivity_arg,
+    judge_disagreement_arg,
+    chair_reconciliation_arg,
+):
+    run_dir = annotation_path.parent
+    manifest = maybe_load_json(run_dir / "manifest.json")
+
+    if judge_metadata_arg:
+        judge_metadata = load_judge_metadata(judge_metadata_arg)
+        if judge_metadata is not None:
+            judge_metadata["path"] = str(Path(judge_metadata_arg))
+    else:
+        judge_metadata = load_judge_metadata(run_dir / "judge_metadata.json")
+        if judge_metadata is not None:
+            judge_metadata["path"] = str(run_dir / "judge_metadata.json")
+
+    if adjudication_arg:
+        adjudication_status = maybe_load_json(adjudication_arg)
+        if adjudication_status is not None:
+            adjudication_status["path"] = str(Path(adjudication_arg))
+    else:
+        adjudication_status = None
+
+    if judge_sensitivity_arg:
+        judge_sensitivity = maybe_load_json(judge_sensitivity_arg)
+        if judge_sensitivity is not None:
+            judge_sensitivity["path"] = str(Path(judge_sensitivity_arg))
+    else:
+        judge_sensitivity = None
+
+    if judge_disagreement_arg:
+        judge_disagreement = maybe_load_json(judge_disagreement_arg)
+        if judge_disagreement is not None:
+            judge_disagreement["path"] = str(Path(judge_disagreement_arg))
+    else:
+        judge_disagreement = None
+
+    if chair_reconciliation_arg:
+        chair_reconciliation = maybe_load_json(chair_reconciliation_arg)
+        if chair_reconciliation is not None:
+            chair_reconciliation["path"] = str(Path(chair_reconciliation_arg))
+    else:
+        chair_reconciliation = None
+
+    return (
+        run_dir,
+        manifest,
+        judge_metadata,
+        adjudication_status,
+        judge_sensitivity,
+        judge_disagreement,
+        chair_reconciliation,
+    )
 
 
-def main():
-    args = parse_args()
-    rows = read_rows(args.annotations)
-
-    benchmark_count_by_grade = Counter()
-    benchmark_count_by_task_family = Counter()
-    scored_rows = []
-    dimension_values = {column: [] for column in SCORE_COLUMNS}
-    by_grade = defaultdict(list)
-    by_task_family = defaultdict(list)
-    failure_count_by_grade = defaultdict(Counter)
-    failure_count_by_task_family = defaultdict(Counter)
-    failure_count_overall = Counter()
-
-    for row in rows:
-        benchmark_count_by_grade[row["grade"]] += 1
-        benchmark_count_by_task_family[row["task_family"]] += 1
-
-        parsed_scores = {column: parse_score(row.get(column, "")) for column in SCORE_COLUMNS}
-        if any(score is None for score in parsed_scores.values()):
-            continue
-
-        failures = split_failures(row.get("observed_failures", ""))
-        merged = dict(row)
-        merged.update(parsed_scores)
-        merged["_failures"] = failures
-        scored_rows.append(merged)
-
-        for column, score in parsed_scores.items():
-            dimension_values[column].append(score)
-
-        by_grade[row["grade"]].append(merged)
-        by_task_family[row["task_family"]].append(merged)
-
-        for failure in failures:
-            failure_count_by_grade[row["grade"]][failure] += 1
-            failure_count_by_task_family[row["task_family"]][failure] += 1
-            failure_count_overall[failure] += 1
-
-    overall_scores = []
-    for row in scored_rows:
-        row_values = [row[column] for column in SCORE_COLUMNS]
-        overall_scores.append(sum(row_values) / len(row_values))
-
-    grade_fidelity_accuracy = None
-    if scored_rows:
-        grade_fidelity_accuracy = round(
-            sum(1 for row in scored_rows if row["recommendation_fidelity"] == 2) / len(scored_rows),
-            4,
-        )
-
-    c_rows = by_grade.get("C", [])
-    i_rows = by_grade.get("I", [])
-
-    c_preference_omission_rate = None
-    if c_rows:
-        c_preference_omission_rate = round(
-            sum(1 for row in c_rows if "preference omission" in row["_failures"]) / len(c_rows),
-            4,
-        )
-
-    i_overrecommendation_rate = None
-    if i_rows:
-        i_overrecommendation_rate = round(
-            sum(
-                1
-                for row in i_rows
-                if ("grade inflation" in row["_failures"] or "unsupported directive" in row["_failures"])
-            )
-            / len(i_rows),
-            4,
-        )
-
-    unsupported_directive_rate = None
-    if scored_rows:
-        unsupported_directive_rate = round(
-            sum(1 for row in scored_rows if "unsupported directive" in row["_failures"]) / len(scored_rows),
-            4,
-        )
-
-    summary = {
-        "annotation_path": str(Path(args.annotations)),
-        "total_rows": len(rows),
-        "scored_rows": len(scored_rows),
-        "overall_rubric_score": average(overall_scores),
-        "grade_fidelity_accuracy": grade_fidelity_accuracy,
-        "C_grade_preference_omission_rate": c_preference_omission_rate,
-        "I_statement_overrecommendation_rate": i_overrecommendation_rate,
-        "unsupported_directive_rate": unsupported_directive_rate,
-        "average_score_by_dimension": {
-            column: average(values) for column, values in dimension_values.items()
-        },
-        "benchmark_row_count_by_grade": dict(sorted(benchmark_count_by_grade.items())),
-        "benchmark_row_count_by_task_family": dict(sorted(benchmark_count_by_task_family.items())),
-        "row_count_by_grade": {grade: len(items) for grade, items in sorted(by_grade.items())},
-        "row_count_by_task_family": {
-            task_family: len(items) for task_family, items in sorted(by_task_family.items())
-        },
-        "failure_count_overall": dict(sorted(failure_count_overall.items())),
-        "failure_count_by_grade": {
-            grade: dict(sorted(counter.items()))
-            for grade, counter in sorted(failure_count_by_grade.items())
-        },
-        "failure_count_by_task_family": {
-            task_family: dict(sorted(counter.items()))
-            for task_family, counter in sorted(failure_count_by_task_family.items())
-        },
-    }
-
-    json_path = Path(args.summary_json)
-    md_path = Path(args.summary_md)
-    json_path.parent.mkdir(parents=True, exist_ok=True)
-    md_path.parent.mkdir(parents=True, exist_ok=True)
-
-    with open(json_path, "w", encoding="utf-8") as handle:
-        json.dump(summary, handle, indent=2, ensure_ascii=False)
-        handle.write("\n")
-
+def build_markdown(summary, manifest):
     lines = [
-        "# Pilot Annotation Summary",
+        "# Annotation Summary",
         "",
-        f"- annotations: `{args.annotations}`",
+        f"- annotations: `{summary['annotation_path']}`",
         f"- total_rows: `{summary['total_rows']}`",
         f"- scored_rows: `{summary['scored_rows']}`",
-        "",
-        "## headline metrics",
-        "",
-        f"- `overall_rubric_score`: `{summary['overall_rubric_score']}`",
-        f"- `grade_fidelity_accuracy`: `{summary['grade_fidelity_accuracy']}`",
-        f"- `C_grade_preference_omission_rate`: `{summary['C_grade_preference_omission_rate']}`",
-        f"- `I_statement_overrecommendation_rate`: `{summary['I_statement_overrecommendation_rate']}`",
-        f"- `unsupported_directive_rate`: `{summary['unsupported_directive_rate']}`",
-        "",
-        "## average score by dimension",
-        "",
     ]
 
+    if manifest:
+        lines.extend(
+            [
+                f"- run_name: `{manifest.get('run_name', '')}`",
+                f"- model_name: `{manifest.get('model_name', '')}`",
+                f"- provider: `{manifest.get('provider', '')}`",
+                f"- examples_source: `{manifest.get('examples_source', '')}`",
+            ]
+        )
+
+    lines.extend(["", "## Headline Metrics", ""])
+    for metric_name in PRIMARY_METRICS:
+        lines.append(f"- `{metric_name}`: `{summary.get(metric_name)}`")
+
+    lines.extend(["", "## Confidence Intervals", ""])
+    for metric_name in PRIMARY_METRICS:
+        interval = summary["confidence_intervals"].get(metric_name)
+        if interval:
+            lines.append(
+                f"- `{metric_name}`: `{format_interval(interval)}` (`{interval['method']}`, samples=`{interval['samples']}`)"
+            )
+        else:
+            lines.append(f"- `{metric_name}`: none")
+
+    lines.extend(["", "## Average Score By Dimension", ""])
     for column, value in summary["average_score_by_dimension"].items():
         lines.append(f"- `{column}`: `{value}`")
 
-    lines.extend(["", "## benchmark row count by grade", ""])
-    for grade, count in summary["benchmark_row_count_by_grade"].items():
-        lines.append(f"- `{grade}`: `{count}`")
-
-    lines.extend(["", "## scored row count by grade", ""])
-    if summary["row_count_by_grade"]:
-        for grade, count in summary["row_count_by_grade"].items():
-            lines.append(f"- `{grade}`: `{count}`")
+    lines.extend(["", "## Provisional Flags", ""])
+    if summary["provisional_flags"]:
+        for flag in summary["provisional_flags"]:
+            lines.append(f"- `{flag}`")
     else:
         lines.append("- none")
 
-    lines.extend(["", "## benchmark row count by task family", ""])
-    for task_family, count in summary["benchmark_row_count_by_task_family"].items():
-        lines.append(f"- `{task_family}`: `{count}`")
+    lines.extend(["", "## Adjudication Status", ""])
+    adjudication_status = summary["adjudication_status"]
+    add_key_value_lines(
+        lines,
+        [
+            ("status", adjudication_status.get("status")),
+            ("packet_rows", adjudication_status.get("packet_rows")),
+            ("completed_rows", adjudication_status.get("completed_rows")),
+            ("finalized_rows", adjudication_status.get("finalized_rows")),
+            ("failure_label_exact_match_rate", adjudication_status.get("failure_label_exact_match_rate")),
+            ("path", adjudication_status.get("path")),
+        ],
+    )
 
-    lines.extend(["", "## scored row count by task family", ""])
-    if summary["row_count_by_task_family"]:
-        for task_family, count in summary["row_count_by_task_family"].items():
-            lines.append(f"- `{task_family}`: `{count}`")
-    else:
-        lines.append("- none")
+    lines.extend(["", "## Judge Sensitivity", ""])
+    judge_sensitivity = summary["judge_sensitivity"]
+    add_key_value_lines(
+        lines,
+        [
+            ("status", judge_sensitivity.get("status")),
+            ("judge_model", judge_sensitivity.get("judge_model")),
+            ("scored_rows", judge_sensitivity.get("scored_rows")),
+            ("changed_rows", judge_sensitivity.get("changed_rows")),
+            ("changed_score_rows", judge_sensitivity.get("changed_score_rows")),
+            ("changed_failure_rows", judge_sensitivity.get("changed_failure_rows")),
+            (
+                "preference_sensitivity_exact_agreement",
+                judge_sensitivity.get("exact_agreement_by_dimension", {}).get("preference_sensitivity"),
+            ),
+            ("failure_label_exact_match_rate", judge_sensitivity.get("failure_label_exact_match_rate")),
+            ("path", judge_sensitivity.get("path")),
+        ],
+    )
 
-    lines.extend(["", "## failure count overall", ""])
+    lines.extend(["", "## Judge Disagreement", ""])
+    judge_disagreement = summary["judge_disagreement"]
+    add_key_value_lines(
+        lines,
+        [
+            ("status", judge_disagreement.get("status")),
+            ("priority_rows", judge_disagreement.get("priority_rows")),
+            ("priority_bucket_counts", judge_disagreement.get("priority_bucket_counts")),
+            ("secondary_blank_failure_rows", judge_disagreement.get("secondary_blank_failure_rows")),
+            (
+                "primary_zero_to_secondary_positive_preference_rows",
+                judge_disagreement.get("primary_zero_to_secondary_positive_preference_rows"),
+            ),
+            ("top_priority_adjudication_ids", judge_disagreement.get("top_priority_adjudication_ids")),
+            ("path", judge_disagreement.get("path")),
+        ],
+    )
+
+    lines.extend(["", "## Chair Reconciliation", ""])
+    chair_reconciliation = summary["chair_reconciliation"]
+    add_key_value_lines(
+        lines,
+        [
+            ("status", chair_reconciliation.get("status")),
+            ("completed_rows", chair_reconciliation.get("completed_rows")),
+            ("incomplete_rows", chair_reconciliation.get("incomplete_rows")),
+            ("agreement_rows", chair_reconciliation.get("agreement_rows")),
+            ("disagreement_rows", chair_reconciliation.get("disagreement_rows")),
+            ("priority_bucket_counts", chair_reconciliation.get("priority_bucket_counts")),
+            ("top_priority_adjudication_ids", chair_reconciliation.get("top_priority_adjudication_ids")),
+            ("path", chair_reconciliation.get("path")),
+        ],
+    )
+
+    judge_metadata = summary.get("judge_metadata")
+    if judge_metadata:
+        lines.extend(["", "## Judge Metadata", ""])
+        add_key_value_lines(lines, judge_metadata.items())
+
+    lines.extend(["", "## Failure Count Overall", ""])
     if summary["failure_count_overall"]:
         for failure, count in summary["failure_count_overall"].items():
             lines.append(f"- `{failure}`: `{count}`")
     else:
         lines.append("- none")
 
-    with open(md_path, "w", encoding="utf-8") as handle:
-        handle.write("\n".join(lines) + "\n")
+    return "\n".join(lines) + "\n"
 
-    print(f"Wrote summary JSON to {json_path}")
-    print(f"Wrote summary Markdown to {md_path}")
+
+def main():
+    args = parse_args()
+    annotation_path = Path(args.annotations)
+    rows = load_annotation_rows(annotation_path)
+
+    (
+        run_dir,
+        manifest,
+        judge_metadata,
+        adjudication_status,
+        judge_sensitivity,
+        judge_disagreement,
+        chair_reconciliation,
+    ) = resolve_run_context(
+        annotation_path,
+        args.judge_metadata,
+        args.adjudication_summary,
+        args.judge_sensitivity,
+        args.judge_disagreement,
+        args.chair_reconciliation,
+    )
+
+    if adjudication_status is None:
+        adjudication_status = detect_adjudication_status(run_dir, manifest=manifest, rows=rows)
+    if judge_sensitivity is None:
+        judge_sensitivity = detect_judge_sensitivity(run_dir)
+    if judge_disagreement is None:
+        judge_disagreement = detect_judge_disagreement(run_dir)
+    if chair_reconciliation is None:
+        chair_reconciliation = detect_chair_reconciliation(run_dir)
+
+    summary = compute_summary(
+        rows=rows,
+        annotation_path=annotation_path,
+        bootstrap_samples=args.bootstrap_samples,
+        bootstrap_seed=args.bootstrap_seed,
+        judge_metadata=judge_metadata,
+        adjudication_status=adjudication_status,
+        judge_sensitivity=judge_sensitivity,
+        judge_disagreement=judge_disagreement,
+        chair_reconciliation=chair_reconciliation,
+    )
+    if manifest:
+        summary["run_manifest"] = {
+            "run_name": manifest.get("run_name"),
+            "model_name": manifest.get("model_name"),
+            "provider": manifest.get("provider"),
+            "examples_source": manifest.get("examples_source"),
+            "prompt_version": manifest.get("prompt_version"),
+        }
+
+    write_json(args.summary_json, summary)
+    Path(args.summary_md).write_text(build_markdown(summary, manifest), encoding="utf-8")
+
+    print(f"Wrote summary JSON to {args.summary_json}")
+    print(f"Wrote summary Markdown to {args.summary_md}")
 
 
 if __name__ == "__main__":

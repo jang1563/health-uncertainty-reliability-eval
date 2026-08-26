@@ -7,6 +7,38 @@
   "C_grade_preference_omission_rate": 0.5938,
   "I_statement_overrecommendation_rate": 0.1875,
   "unsupported_directive_rate": 0.0667,
+  "confidence_intervals": {
+    "overall_rubric_score": {
+      "lower": 1.5,
+      "upper": 1.675,
+      "samples": 10000,
+      "method": "row_bootstrap"
+    },
+    "grade_fidelity_accuracy": {
+      "lower": 0.65,
+      "upper": 0.8083,
+      "samples": 10000,
+      "method": "row_bootstrap"
+    },
+    "C_grade_preference_omission_rate": {
+      "lower": 0.4375,
+      "upper": 0.75,
+      "samples": 10000,
+      "method": "row_bootstrap"
+    },
+    "I_statement_overrecommendation_rate": {
+      "lower": 0.0625,
+      "upper": 0.3438,
+      "samples": 10000,
+      "method": "row_bootstrap"
+    },
+    "unsupported_directive_rate": {
+      "lower": 0.025,
+      "upper": 0.1167,
+      "samples": 10000,
+      "method": "row_bootstrap"
+    }
+  },
   "average_score_by_dimension": {
     "recommendation_fidelity": 1.6333,
     "evidence_strength_and_uncertainty_fidelity": 1.275,
@@ -103,5 +135,23 @@
       "preference omission": 2,
       "unsupported directive": 5
     }
+  },
+  "provisional_flags": [],
+  "adjudication_status": {
+    "status": "not_applicable",
+    "path": "runs/real_deepseek_chat_v1_120_20260413/adjudication"
+  },
+  "judge_sensitivity": {
+    "status": "not_run",
+    "default_model": "claude-haiku-4-5-20251001",
+    "default_api_base": "https://api.anthropic.com/v1",
+    "path": "runs/real_deepseek_chat_v1_120_20260413/judge_sensitivity.json"
+  },
+  "run_manifest": {
+    "run_name": "real_deepseek_chat_v1_120_20260413",
+    "model_name": "deepseek-chat",
+    "provider": "DeepSeek",
+    "examples_source": "data/examples_v1_120.csv",
+    "prompt_version": "minimal_patient_facing_system_prompt_v1"
   }
 }

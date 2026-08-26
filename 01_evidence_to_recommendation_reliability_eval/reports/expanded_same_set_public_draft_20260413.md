@@ -1,19 +1,22 @@
-# Recommendation-Posture Reliability in Preventive Care
+# Supporting Stress-Test Draft: Recommendation-Posture Reliability in Preventive Care
 
-- checked_on: `2026-04-13`
-- artifact_type: `publication-style draft`
-- benchmark_slice: `examples_v1_40.csv`
+- checked_on: `2026-04-16`
+- artifact_type: `supporting publication-style draft`
+- benchmark_slice: `examples_v1_40.csv` (supporting stress test; canonical release benchmark is `examples_v1_120.csv`)
 - compared_models: `gpt-5-mini`, `gpt-5-nano`
-- freeze_status: `working frozen after two refresh passes plus final residual reread`
+- freeze_status: `working frozen after two refresh passes plus final residual reread; retained as supporting stress-test context after the canonical 120-row release package`
 - supporting_artifacts:
   - `reports/real_run_comparison_v1_40_20260412.md`
   - `reports/annotation_freeze_notes_v1_40_20260413.md`
   - `figures/real_v1_40_metric_comparison.svg`
   - `figures/real_v1_40_failure_count_comparison.svg`
+  - `reports/health_reliability_eval_v1.md`
+
+> Status note: this document is a supporting `40`-row stress-test draft. For release-facing claims, use `reports/health_reliability_eval_v1.md`, which treats the frozen `120`-row benchmark as canonical and the `40`-row package as supporting context.
 
 ## Abstract
 
-This benchmark asks a narrow question: can a model answer patient-facing preventive-care questions without distorting recommendation strength, uncertainty, or preference sensitivity? On a frozen `40`-row same-set slice spanning `A/B/C/D/I` recommendation contexts, `gpt-5-nano` slightly outperformed `gpt-5-mini` on overall rubric score (`1.835` vs `1.805`) and was cleaner on the benchmark's most safety-sensitive posture metrics (`C`-grade preference omission `0.0` vs `0.125`, `I`-statement overrecommendation `0.0` vs `0.125`, unsupported directive `0.0` vs `0.025`). `gpt-5-mini` retained a small advantage on direct grade fidelity (`0.85` vs `0.80`). The most important implication is not a universal model ranking, but that ordering flipped relative to the earlier `20`-row pilot and remained flipped after manual adjudication refreshes. On this slice, `C` and `I` rows were the decisive stress test.
+This supporting draft asks a narrow question: can a model answer patient-facing preventive-care questions without distorting recommendation strength, uncertainty, or preference sensitivity? On a frozen `40`-row same-set slice spanning `A/B/C/D/I` recommendation contexts, `gpt-5-nano` slightly outperformed `gpt-5-mini` on overall rubric score (`1.835` vs `1.805`) and was cleaner on the benchmark's most safety-sensitive posture metrics (`C`-grade preference omission `0.0` vs `0.125`, `I`-statement overrecommendation `0.0` vs `0.125`, unsupported directive `0.0` vs `0.025`). `gpt-5-mini` retained a small advantage on direct grade fidelity (`0.85` vs `0.80`). The most important implication is not a universal model ranking, but that ordering flipped relative to the earlier `20`-row pilot and remained flipped after manual adjudication refreshes. Read this slice as a supporting stress test rather than the canonical release benchmark.
 
 ## What This Benchmark Measures
 
@@ -108,10 +111,10 @@ Third, `C` and `I` rows remain the highest-yield stress test. These are the rows
 
 ## Practical Takeaway
 
-For this benchmark slice, the safer summary is not "nano is better than mini." The better summary is: `gpt-5-nano` was more stable on the benchmark's hardest posture-preservation tasks, while `gpt-5-mini` remained slightly better on direct grade matching. If this benchmark is used to study patient-facing reliability under uncertainty, the expanded same-set result should be treated as the primary current signal, and the earlier `20`-row pilot should be treated as a smaller precursor rather than the final ranking.
+For this benchmark slice, the safer summary is not "nano is better than mini." The better summary is: `gpt-5-nano` was more stable on the benchmark's hardest posture-preservation tasks, while `gpt-5-mini` remained slightly better on direct grade matching. If this benchmark is used to study patient-facing reliability under uncertainty, the expanded same-set result should be treated as supporting stress-test evidence alongside the canonical `120`-row report, and the earlier `20`-row pilot should be treated as a smaller precursor rather than the final ranking.
 
 ## Next Moves
 
-- turn this draft into a shorter external report with one main table and one figure
-- add a third-model run on the same `40`-row slice
-- use dual-human adjudication on the final `3` hard cases if a more formal benchmark freeze is needed
+- keep this draft as supporting context while the canonical release report stays anchored to `reports/health_reliability_eval_v1.md`
+- use the `40`-row slice for stress tests and judge-sensitivity follow-up rather than as a standalone benchmark release
+- add broader model coverage only after the adjudicated `120`-row release candidate is complete

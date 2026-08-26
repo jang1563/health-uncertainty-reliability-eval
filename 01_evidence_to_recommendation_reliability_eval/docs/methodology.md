@@ -1,66 +1,78 @@
 # Methodology
 
-- checked_on: `2026-04-13`
+- checked_on: `2026-04-16`
 - project: `Evidence-to-Recommendation Reliability Eval`
-- current_phase: `full-v1 dataset scaffold`
+- current_phase: `adjudicated v1 release candidate`
 
-## 1. 목표
+## 1. Scope
 
-이 benchmark는 모델이 `예방의학 권고의 방향과 강도`를 환자-facing 답변에서 얼마나 충실하게 보존하는지 평가한다. 핵심은 fact recall 자체보다 아래 세 가지다.
+This benchmark evaluates whether patient-facing model answers preserve:
 
-- `grade fidelity`
-- `uncertainty fidelity`
-- `preference-sensitive communication`
+- `recommendation direction`
+- `recommendation strength`
+- `uncertainty disclosure`
+- `preference-sensitive framing`
 
-## 2. source selection rule
+The target is not factual medical QA in general. The target is **recommendation-posture fidelity** on curated preventive-care prompts derived from public evidence posture.
 
-pilot는 모두 `current published USPSTF recommendation statements`에서 출발한다. source cutoff는 `2026-04-10`이다.
+## 2. Source Selection
 
-source 선택 기준은 아래와 같다.
+Rows are derived from currently published `USPSTF` recommendation statements, with `AHRQ` used to support rubric and shared-decision framing. The source cutoff for the current release substrate is `2026-04-10`.
 
-- `A/B/C/D/I` 모든 grade가 pilot에서 최소 1회 이상 등장해야 한다.
-- `C`와 `I`는 이 benchmark의 중심이므로 pilot에서도 여러 번 반복한다.
-- 한 source page가 여러 population slice와 grade를 포함하면 slice 단위로 pool에 기록한다.
-- archived-only topic은 pilot에서 제외한다.
+Selection rules:
 
-## 3. row construction rule
+- all `A/B/C/D/I` grades must appear in the benchmark
+- `C` and `I` are intentionally overrepresented because they are the main posture-sensitive stress cases
+- source pages with multiple populations or grades are split by population-grade slice
+- rows are paraphrase-first rather than long-quote reproductions
 
-각 example row는 아래 순서로 작성한다.
+## 3. Dataset Structure
 
-1. source page에서 `population`, `grade`, `release_date`, `canonical topic URL`을 고정한다.
-2. 해당 grade에 맞는 `expected_posture`를 정한다.
-3. 사용자 질문을 layperson-style로 재구성한다.
-4. `required_points`에 반드시 살아 있어야 할 의미 요소를 paraphrase로 기록한다.
-5. `forbidden_moves`에 대표 failure를 명시한다.
+Three frozen benchmark layers are kept:
 
-## 4. dataset design
+- `20`-row pilot
+- `40`-row same-set supporting stress test
+- `120`-row full-v1 canonical benchmark
 
-pilot 규모는 `20` rows였고, current full-v1 scaffold는 `120` rows다.
+The canonical release substrate is `data/examples_v1_120.csv`.
 
-- `A`: 4
-- `B`: 4
-- `C`: 4
-- `D`: 4
-- `I`: 4
+Grade distribution in full-v1:
 
-full v1 target 분포는 아래와 같다.
+- `A`: `16`
+- `B`: `24`
+- `C`: `32`
+- `D`: `16`
+- `I`: `32`
 
-- `A`: 16
-- `B`: 24
-- `C`: 32
-- `D`: 16
-- `I`: 32
-
-task family는 네 가지를 쓴다.
+Task families:
 
 - `direct_recommendation`
 - `expert_explanation`
 - `preference_sensitive`
 - `uncertainty_elicitation`
 
-## 5. evaluation logic
+## 4. Row Construction
 
-모델 응답은 아래 다섯 차원으로 채점한다.
+Each row fixes:
+
+- source topic
+- target population
+- recommendation grade
+- expected posture
+- required meaning points
+- forbidden moves
+
+Construction order:
+
+1. anchor the population, grade, release date, and source URL
+2. define the intended posture for a patient-facing answer
+3. paraphrase a layperson-style user prompt
+4. record `required_points`
+5. record `forbidden_moves`
+
+## 5. Scoring Logic
+
+Each response is scored on five `0/1/2` dimensions:
 
 - `recommendation_fidelity`
 - `evidence_strength_and_uncertainty_fidelity`
@@ -68,15 +80,7 @@ task family는 네 가지를 쓴다.
 - `action_safety`
 - `communication_clarity`
 
-각 차원은 `0/1/2` scale을 기본으로 한다.
-
-- `0`: not aligned or unsafe
-- `1`: partially aligned
-- `2`: fully aligned
-
-## 6. failure taxonomy
-
-pilot에서 우선 추적할 failure는 아래 여섯 가지다.
+The current failure taxonomy remains:
 
 - `grade inflation`
 - `grade deflation`
@@ -85,44 +89,75 @@ pilot에서 우선 추적할 failure는 아래 여섯 가지다.
 - `unsupported directive`
 - `plausible but ungrounded claim`
 
-## 7. rights and reuse
+The taxonomy is frozen for the current release candidate. If the ongoing Sonnet adjudication shows systematic misuse of `preference omission` on `A/D/I` rows, taxonomy revisions happen only after the blinded merge is complete.
 
-- `USPSTF`: paraphrase-first
-- `AHRQ`: rubric derivation 중심
-- `MedlinePlus`: public-domain scope가 명확한 경우만 후속 연결
+## 6. Run And Judge Workflow
 
-현재 pilot `examples.csv`의 `medlineplus_url`은 intentionally sparse하다. 먼저 benchmark identity와 grade fidelity를 고정한 뒤, public-domain scope가 분명한 patient-facing links만 보강한다.
+Primary workflow:
 
-## 8. non-goals
+1. export or prepare prompts
+2. generate `outputs.csv`
+3. merge into `annotation_sheet.csv`
+4. score with `scripts/judge_annotations_openai.py`
+5. summarize with `scripts/summarize_annotations.py`
+6. finalize run outputs
 
-이 프로젝트는 아래를 목표로 하지 않는다.
+Judge policy for the current release candidate:
 
-- 환자 개별 진단
-- triage tool 배포
-- guideline generation engine 구축
-- clinician replacement claim
+- full response text is the primary path
+- fallback truncation is allowed only when the full-response attempt fails
+- any fallback truncation is recorded in `judge_metadata.json`
+- run summaries now emit bootstrap confidence intervals and provisional flags
 
-## 9. annotation workflow
+## 7. Adjudication Workflow
 
-현재 pilot는 아래 순서로 평가한다.
+Formal adjudication is now part of the release path for benchmark-critical anomalies.
 
-1. `scripts/export_prompt_pack.py`로 JSONL prompt pack 생성
-2. `data/model_outputs_template.csv` 또는 실제 model output CSV 준비
-3. `scripts/build_annotation_sheet.py`로 merged annotation sheet 생성
-4. evaluator 또는 LLM-as-judge가 각 row를 `0/1/2` scale로 채점
-5. `scripts/summarize_annotations.py`로 aggregate metric과 failure breakdown 생성
+Current adjudication target:
 
-annotation sheet에는 아래 정보가 함께 들어간다.
+- `claude-sonnet-4-6`
+- all `A/D/I` rows labeled `preference omission`
+- all `C` rows labeled `preference omission`
+- total packet size: `53`
 
-- benchmark row 핵심 context
-- model response
-- 다섯 rubric dimension 점수
-- observed failure labels
-- evaluator notes
+Artifacts:
 
-## 10. next implementation step
+- `adjudication_packet.csv`
+- `rater_a_sheet.csv`
+- `rater_b_sheet.csv`
+- `final_adjudication_sheet.csv`
+- `adjudication_merged.csv`
+- `agreement_summary.json`
+- optional role-based packaging:
+  - `panel_handoff/rater_a/`
+  - `panel_handoff/rater_b/`
+  - `panel_handoff/chair/`
+- optional chair-reconciliation outputs after both raters return:
+  - `chair_reconciliation_queue.csv`
+  - `chair_reconciliation_summary.json`
+  - `chair_reconciliation_brief.md`
 
-- canonical full-v1 model output 수집
-- `120`-row run annotation 수행
-- metric summary와 qualitative case 생성
-- full-v1 comparison report 반영
+The current packet is built, but human review is still incomplete.
+
+## 8. Statistical Reporting
+
+The release candidate uses:
+
+- per-run `95%` row-bootstrap confidence intervals (`10,000` samples)
+- paired row-bootstrap deltas for same-set run comparisons (`10,000` samples)
+- practical-difference thresholds:
+  - `0.05` for `overall_rubric_score`
+  - `0.10` for rate metrics
+
+If a CI overlaps zero or the delta stays below the practical threshold, the comparison remains descriptive rather than headline-ranking evidence.
+
+## 9. Non-goals
+
+This project does not claim:
+
+- clinician replacement
+- deployment readiness
+- personalized diagnosis or triage
+- general health benchmark coverage
+
+It is a curated preventive-care posture-fidelity stress test.

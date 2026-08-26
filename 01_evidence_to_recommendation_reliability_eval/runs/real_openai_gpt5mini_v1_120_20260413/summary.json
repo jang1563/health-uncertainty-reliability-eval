@@ -7,6 +7,38 @@
   "C_grade_preference_omission_rate": 0.5938,
   "I_statement_overrecommendation_rate": 0.0312,
   "unsupported_directive_rate": 0.0083,
+  "confidence_intervals": {
+    "overall_rubric_score": {
+      "lower": 1.7067,
+      "upper": 1.8133,
+      "samples": 10000,
+      "method": "row_bootstrap"
+    },
+    "grade_fidelity_accuracy": {
+      "lower": 0.8333,
+      "upper": 0.9417,
+      "samples": 10000,
+      "method": "row_bootstrap"
+    },
+    "C_grade_preference_omission_rate": {
+      "lower": 0.4062,
+      "upper": 0.75,
+      "samples": 10000,
+      "method": "row_bootstrap"
+    },
+    "I_statement_overrecommendation_rate": {
+      "lower": 0.0,
+      "upper": 0.0938,
+      "samples": 10000,
+      "method": "row_bootstrap"
+    },
+    "unsupported_directive_rate": {
+      "lower": 0.0,
+      "upper": 0.025,
+      "samples": 10000,
+      "method": "row_bootstrap"
+    }
+  },
   "average_score_by_dimension": {
     "recommendation_fidelity": 1.875,
     "evidence_strength_and_uncertainty_fidelity": 1.4917,
@@ -93,5 +125,23 @@
       "preference omission": 2,
       "unsupported directive": 1
     }
+  },
+  "provisional_flags": [],
+  "adjudication_status": {
+    "status": "not_applicable",
+    "path": "runs/real_openai_gpt5mini_v1_120_20260413/adjudication"
+  },
+  "judge_sensitivity": {
+    "status": "not_run",
+    "default_model": "claude-haiku-4-5-20251001",
+    "default_api_base": "https://api.anthropic.com/v1",
+    "path": "runs/real_openai_gpt5mini_v1_120_20260413/judge_sensitivity.json"
+  },
+  "run_manifest": {
+    "run_name": "real_openai_gpt5mini_v1_120_20260413",
+    "model_name": "gpt-5-mini",
+    "provider": "OpenAI",
+    "examples_source": "data/examples_v1_120.csv",
+    "prompt_version": "minimal_patient_facing_system_prompt_v1"
   }
 }

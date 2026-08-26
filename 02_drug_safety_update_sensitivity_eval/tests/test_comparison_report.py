@@ -1,5 +1,6 @@
 import json
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -293,7 +294,7 @@ class ComparisonReportTests(unittest.TestCase):
 
             completed = subprocess.run(
                 [
-                    "python3",
+                    sys.executable,
                     "scripts/build_comparison_report.py",
                     "--run",
                     f"haiku={run_a_path}",
