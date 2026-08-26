@@ -2,18 +2,18 @@
 
 **Does the model's answer change in the right direction after a new FDA safety update?**
 
-This benchmark evaluates whether AI models appropriately shift their answers to the same user question when provided with updated FDA post-market safety information. It measures *update sensitivity* — not drug knowledge accuracy.
+This benchmark evaluates whether AI models appropriately shift their answers to the same user question when provided with updated FDA post-market safety information. It measures *update sensitivity*: not drug knowledge accuracy.
 
 ## What This Is
 
 A benchmark-style evaluation package with 90 items (30 FDA safety events x 3 prompt variants). Each event includes:
 
-1. A **before_packet** — curated summary of the drug's safety profile *before* an FDA update
-2. An **after_packet** — curated summary reflecting the *new* FDA safety update
+1. A **before_packet**: curated summary of the drug's safety profile *before* an FDA update
+2. An **after_packet**: curated summary reflecting the *new* FDA safety update
 3. Three **user_question** variants (patient, caregiver, medication-use decision)
 4. Scoring annotations for directional answer shift
 
-The model is prompted twice per item — once with the before_packet, once with the after_packet — and the answer pair is scored on whether the after-answer shifts appropriately relative to the before-answer.
+The model is prompted twice per item: once with the before_packet, once with the after_packet: and the answer pair is scored on whether the after-answer shifts appropriately relative to the before-answer.
 
 ## What This Is NOT
 
@@ -26,9 +26,9 @@ The model is prompted twice per item — once with the before_packet, once with 
 
 To our review as of April 10, 2026, we did not find a public benchmark focused on whether model answers appropriately change after new FDA post-market safety updates.
 
-Existing medication benchmarks (LabelComp, AskFDALabel, Rx-LLM, FDARxBench) address label diff detection, label QA, medication task accuracy, or document-grounded reasoning — but none use a paired before/after protocol to measure same-question answer shift after regulatory updates.
+Existing medication benchmarks (LabelComp, AskFDALabel, Rx-LLM, FDARxBench) address label diff detection, label QA, medication task accuracy, or document-grounded reasoning: but none use a paired before/after protocol to measure same-question answer shift after regulatory updates.
 
-Temporal knowledge benchmarks (EvolveBench, DyKnow) evaluate parametric knowledge staleness — whether models recall time-sensitive facts from training. This benchmark evaluates a different capability: context-mediated response shift — whether models appropriately change answers when given different evidence packets at inference time, independent of knowledge cutoff.
+Temporal knowledge benchmarks (EvolveBench, DyKnow) evaluate parametric knowledge staleness: whether models recall time-sensitive facts from training. This benchmark evaluates a different capability: context-mediated response shift: whether models appropriately change answers when given different evidence packets at inference time, independent of knowledge cutoff.
 
 ## Core Evaluation Questions
 
@@ -93,10 +93,10 @@ See [reports/v1_results_summary.md](reports/v1_results_summary.md) for the full 
 
 | Source | Usage |
 |---|---|
-| FDA Drug Safety Communications | Paraphrase only — no long-copy |
-| FDA SrLC | Paraphrase only — source-linked event reference |
+| FDA Drug Safety Communications | Paraphrase only: no long-copy |
+| FDA SrLC | Paraphrase only: source-linked event reference |
 | openFDA | Metadata and query linkage |
-| DailyMed | Link only — not a text source |
+| DailyMed | Link only: not a text source |
 
 All benchmark packets are human-authored normalized summaries. No verbatim FDA or DailyMed text is redistributed.
 
@@ -128,7 +128,6 @@ eval/
   output/                  # Per-model eval_results.jsonl + run_manifest.json
 scripts/
   build_comparison_report.py
-  build_manuscript_report.py
   run_judge_sensitivity.py # Sonnet judge-sensitivity validation subset
   sanitize_manifests.py    # Dev helper: rewrite manifest paths to project-relative
   generate_remaining_events.py  # Dataset-build helper used during v1 construction
@@ -142,7 +141,6 @@ tests/
 reports/
   v1_results_summary.md                     # Top-level summary of all runs
   cross_model_comparison.md                 # Detailed side-by-side analysis
-  manuscript_style_results_draft.md         # Manuscript-style synthesis of benchmark results
   haiku_v2.md                               # claude-haiku-4-5-20251001
   gpt4o_mini.md                             # gpt-4o-mini
   gpt5_nano.md                              # gpt-5-nano
@@ -187,14 +185,6 @@ python eval/report_generator.py eval/output/eval_results.jsonl
 # Generate synthetic outputs without API calls
 python eval/run_mock_eval.py --output eval/output/mock_run
 
-# Build the manuscript-style benchmark draft from completed runs
-python scripts/build_manuscript_report.py \
-  --run "haiku_v2=eval/output/haiku_v2/eval_results.jsonl" \
-  --run "gpt-4o-mini=eval/output/gpt4o_mini/eval_results.jsonl" \
-  --run "gpt-5-nano=eval/output/gpt5_nano/eval_results.jsonl" \
-  --judge-sensitivity eval/output/judge_sensitivity_sonnet_subset/rejudged_scores.jsonl \
-  --output reports/manuscript_style_results_draft.md
-
 # Re-judge a curated 10-item subset with Sonnet for judge-sensitivity validation
 .venv/bin/python3 scripts/run_judge_sensitivity.py \
   --run "haiku_v2=eval/output/haiku_v2/eval_results.jsonl" \
@@ -209,12 +199,11 @@ Each evaluation run also writes `run_manifest.json` into the chosen output direc
 
 ## Documentation
 
-- [v1 Results Summary](reports/v1_results_summary.md) — compact topline benchmark outcomes and judge-sensitivity summary
-- [Cross-Model Comparison](reports/cross_model_comparison.md) — detailed side-by-side analysis across the three evaluated models
-- [Manuscript-Style Results Draft](reports/manuscript_style_results_draft.md) — paper-planning synthesis of the current benchmark outcomes
-- [Methodology](docs/methodology.md) — evaluation protocol, packet templates, rubric definitions
-- [Limitations](docs/limitations.md) — known limitations and scope boundaries
-- [Judge Sensitivity Report](reports/judge_sensitivity_sonnet_subset.md) — 10-case Sonnet re-judging subset across completed model runs
+- [v1 Results Summary](reports/v1_results_summary.md): compact topline benchmark outcomes and judge-sensitivity summary
+- [Cross-Model Comparison](reports/cross_model_comparison.md): detailed side-by-side analysis across the three evaluated models
+- [Methodology](docs/methodology.md): evaluation protocol, packet templates, rubric definitions
+- [Limitations](docs/limitations.md): known limitations and scope boundaries
+- [Judge Sensitivity Report](reports/judge_sensitivity_sonnet_subset.md): 10-case Sonnet re-judging subset across completed model runs
 
 ## Citing
 
@@ -231,11 +220,29 @@ Machine-readable citation metadata is in [CITATION.cff](CITATION.cff).
 
 This repository uses a split license:
 
-- **Code** (`eval/`, `scripts/`, `tests/`, all `.py` files) — [Apache License 2.0](LICENSE).
-- **Data, prompts, rubrics, figures, reports, research** (`data/`, `docs/`, `figures/`, `reports/`, `research/`, all `.md`/`.csv`/`.jsonl`/`.json`/`.png`/`.svg`) — [Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)](LICENSE-DATA).
+- **Code** (`eval/`, `scripts/`, `tests/`, all `.py` files): [Apache License 2.0](LICENSE).
+- **Data, prompts, rubrics, figures, reports, research** (`data/`, `docs/`, `figures/`, `reports/`, `research/`, all `.md`/`.csv`/`.jsonl`/`.json`/`.png`/`.svg`): [Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)](LICENSE-DATA).
 
 **Non-profit / academic / personal use**: free under the terms above, with attribution.
 
 **For-profit / commercial use of the dataset, prompts, or rubrics**: requires a separate commercial license. Contact the author (see [CITATION.cff](CITATION.cff)) for commercial licensing.
 
 FDA source documents referenced in the benchmark are public U.S. government information; benchmark packets are human-authored paraphrases with source URLs preserved (see [Source Policy](#source-policy)).
+
+## Manuscript-style report
+
+`scripts/build_manuscript_report.py` turns completed runs into a manuscript-style
+results draft, and `scripts/run_judge_sensitivity.py` re-judges a curated subset
+with a second judge so judge sensitivity can be reported alongside the headline.
+
+```bash
+python scripts/build_manuscript_report.py \
+  --run "haiku_v2=eval/output/haiku_v2/eval_results.jsonl" \
+  --run "gpt-4o-mini=eval/output/gpt4o_mini/eval_results.jsonl" \
+  --run "gpt-5-nano=eval/output/gpt5_nano/eval_results.jsonl" \
+  --judge-sensitivity eval/output/judge_sensitivity_sonnet_subset/rejudged_scores.jsonl \
+  --output reports/manuscript_style_results_draft.md
+```
+
+Each evaluation run writes `run_manifest.json` into its output directory, so a
+later comparison can verify that judge, model, and dataset match.
